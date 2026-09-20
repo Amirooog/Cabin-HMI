@@ -444,6 +444,10 @@ body.pwa .rp header{padding-top:calc(14px + var(--sat))}
 body.pwa .rp .body{padding-bottom:calc(14px + var(--sab))}
 body.pwa .ovl{padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var(--sab))}
 @media (min-width:1150px) and (min-height:800px){#app{font-size:18px}.dock button{flex-basis:92px}}
+
+/* installed app: paint the whole canvas, so any area the OS keeps outside the viewport matches */
+body.pwa{background:var(--screen)}
+body.pwa #amb i{opacity:.95}
 </style>
 </head>
 <body>
@@ -465,7 +469,7 @@ body.pwa .ovl{padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var
 <script>
 (()=>{
 /* ---------- build identity (see CHANGELOG.md) ---------- */
-const BUILD={id:'TB-2.0.2',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
+const BUILD={id:'TB-2.0.3',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
 /* ---------- icons ---------- */
 const IP={
 home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -893,12 +897,16 @@ function updNavUI(r){const set=(id,v)=>{const e=document.getElementById(id);if(e
   const mt=manText(r);set('manD',mt[0]);set('manT',mt[1]);set('nMin',N(r.min));set('nKm',N(r.km));set('nArr',N(r.arr));
   const np=document.getElementById('npMin');if(np)np.textContent=N(r.min)}
 
+function diag(){const r=getComputedStyle(document.documentElement);
+  const sa=(r.getPropertyValue('--sat')||'0').trim()+'/'+(r.getPropertyValue('--sab')||'0').trim();
+  const st=document.body.classList.contains('pwa')?'app':'browser';
+  return `${st} · ${Math.round(window.innerWidth)}×${Math.round(window.innerHeight)} · screen ${Math.round(screen.width)}×${Math.round(screen.height)} · inset ${sa}`}
 function settings(){
   return `<div class="scr${enterCls}" style="overflow-y:auto"><div class="set">
    <div class="card srow"><span class="lbl">${t('display')}</span><div class="bri" dir="ltr"><button ${A('bright','-')} aria-label="−">${I('minus')}</button><div class="bar2"><i style="width:${PREF.bright}%"></i></div><button ${A('bright','+')} aria-label="+">${I('plus')}</button></div></div>
    <div class="card srow"><span class="lbl">${t('language')}</span><div class="seg"><button class="${S.lang==='fa'?'on':''}" ${A('lang','fa')}>فارسی</button><button class="${S.lang==='en'?'on':''}" ${A('lang','en')}>English</button></div></div>
    <div class="card srow"><span class="lbl">${t('tsound')}</span><div class="seg"><button class="${PREF.click?'on':''}" ${A('click','1')}>${t('on')}</button><button class="${!PREF.click?'on':''}" ${A('click','0')}>${t('off')}</button></div></div>
-   <div class="srow" style="color:var(--tx3)"><span>${t('about')} · <span dir="ltr">${BUILD.id}</span></span></div></div></div>`;
+   <div class="srow" style="color:var(--tx3)"><span>${t('about')}</span><span dir="ltr" class="num">${BUILD.id} · ${diag()}</span></div></div></div>`;
 }
 
 /* ---------- map (procedural city; grid space rotated for an organic look) ---------- */

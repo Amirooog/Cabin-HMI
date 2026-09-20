@@ -14,6 +14,9 @@ Rules
 - Freeze a build before data collection starts: tag it `-field` in the notes below and change nothing until collection ends.
 - Upload `index.html` + `sw.js` together; the id in both must match.
 
+## TB-2.0.3 — 2026-09-20
+- Installed app: manifest display standalone (with fullscreen preferred), page canvas painted in the app's own base colour so any strip the OS keeps outside the viewport is not black, diagnostic line in Settings (build, window size, screen size, measured insets).
+
 ## TB-2.0.2 — 2026-09-20
 - Fix: installed app now fills the iPad screen. The safe-area insets are applied inside the screen (status row and bottom bar) instead of around it, with a fallback when iPadOS reports no insets, plus a manual Screen fit nudge in the researcher panel.
 - Slightly larger type and dock on 11-inch and larger displays.
