@@ -453,6 +453,8 @@ svg.f{fill:currentColor;stroke:none}
 
 <script>
 (()=>{
+/* ---------- build identity (see CHANGELOG.md) ---------- */
+const BUILD={id:'TB-2.0.1',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
 /* ---------- icons ---------- */
 const IP={
 home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -518,7 +520,7 @@ whereTo:['Where to?','کجا می‌روید؟'],saved:['Saved places','مکان
 start:['Start','شروع مسیر'],cancel:['Cancel','لغو'],endRoute:['End route','پایان مسیریابی'],arrive:['Arrival','زمان رسیدن'],min:['min','دقیقه'],km:['km','کیلومتر'],m:['m','متر'],
 space:['space','فاصله'],
 display:['Display brightness','روشنایی نمایشگر'],language:['Language','زبان'],tsound:['Touch sound','صدای لمس'],on:['On','روشن'],off:['Off','خاموش'],
-about:['Touch-only baseline prototype · v1.0','نمونه اولیه مرجع — فقط لمسی · نسخه ۱٫۰'],
+about:['Touch Baseline prototype','نمونه اولیه مرجع لمسی'],
 range:['Range','برد باقی‌مانده'],odo:['Trip','مسافت سفر'],cons:['Avg. consumption','میانگین مصرف'],outside:['Outside','دمای بیرون'],
 vol:['Volume','صدا'],level:['Level','سطح'],driveMode:['Drive mode','حالت رانندگی'],locked:['Drive mode is locked during the test','حالت رانندگی در طول آزمون قفل است'],arrived:['You have arrived','به مقصد رسیدید'],done:['Done','پایان'],nextTrack:['Next','بعدی']
 };
@@ -885,7 +887,7 @@ function settings(){
    <div class="card srow"><span class="lbl">${t('display')}</span><div class="bri" dir="ltr"><button ${A('bright','-')} aria-label="−">${I('minus')}</button><div class="bar2"><i style="width:${PREF.bright}%"></i></div><button ${A('bright','+')} aria-label="+">${I('plus')}</button></div></div>
    <div class="card srow"><span class="lbl">${t('language')}</span><div class="seg"><button class="${S.lang==='fa'?'on':''}" ${A('lang','fa')}>فارسی</button><button class="${S.lang==='en'?'on':''}" ${A('lang','en')}>English</button></div></div>
    <div class="card srow"><span class="lbl">${t('tsound')}</span><div class="seg"><button class="${PREF.click?'on':''}" ${A('click','1')}>${t('on')}</button><button class="${!PREF.click?'on':''}" ${A('click','0')}>${t('off')}</button></div></div>
-   <div class="srow" style="color:var(--tx3)"><span>${t('about')}</span></div></div></div>`;
+   <div class="srow" style="color:var(--tx3)"><span>${t('about')} · <span dir="ltr">${BUILD.id}</span></span></div></div></div>`;
 }
 
 /* ---------- map (procedural city; grid space rotated for an organic look) ---------- */
@@ -1046,6 +1048,7 @@ window.addEventListener('resize',()=>document.querySelectorAll('canvas[data-map]
 const TIMEOUT=120000;
 let trial=null, db=null, dl=null, remote=null, local=store.get('trials',[]), msg='';
 let pending=null;
+window.__trialRunning=()=>!!(trial&&trial.running);
 
 // log every touch inside the HMI while a trial runs
 document.addEventListener('pointerdown',e=>{
@@ -1066,7 +1069,7 @@ function startTask(id){
    <div class="k">${tk.id} · ${tk.lv}</div><div class="q">${esc(q)}</div>${PREF.occ.on?`<div style="color:var(--tx2);font-size:18px">${S.lang==='fa'?'صفحه به‌طور متناوب تاریک می‌شود. کار را ادامه دهید.':'The screen will go dark at intervals. Keep going.'}</div>`:''}
    <button class="btn pri" id="goBtn">${S.lang==='fa'?'شروع':'Start'}</button></div></div>`;
   $('#goBtn').onclick=()=>{ $('#ovl').innerHTML='';
-    trial={task:tk,base:JSON.parse(JSON.stringify(S)),start:performance.now(),startedAt:new Date().toISOString(),taps:0,misses:0,first:null,path:[],running:true,layout:PREF.layout,mode:S.mode,occ:null};
+    trial={task:tk,base:JSON.parse(JSON.stringify(S)),start:performance.now(),startedAt:new Date().toISOString(),taps:0,misses:0,first:null,path:[],running:true,layout:PREF.layout,mode:S.mode,build:BUILD.id,occ:null};
     if(PREF.occ.on){trial.occ={open:true,openAt:performance.now(),tsot:0,intervals:1,taps:0,timer:null,o:+PREF.occ.open||1500,c:+PREF.occ.closed||1500};occCycle()}
     pending=null; renderStatus(); };
 }
@@ -1082,7 +1085,7 @@ async function finish(result){
   const dur=Math.round(endAt-trial.start); const oc=trial.occ;
   const rec={participant:PREF.participant||'—',condition:PREF.condition||'',task:trial.task.id,level:trial.task.lv,taskLabel:trial.task.en,
     result,durationMs:dur,taps:trial.taps,misses:trial.misses,firstTapMs:trial.first==null?null:Math.round(trial.first),
-    screens:[...new Set(trial.path.map(p=>p.s))],path:trial.path,lang:S.lang,startedAt:trial.startedAt,layout:trial.layout,mode:trial.mode,
+    screens:[...new Set(trial.path.map(p=>p.s))],path:trial.path,lang:S.lang,startedAt:trial.startedAt,layout:trial.layout,mode:trial.mode,build:trial.build,
     occlusion:oc?`${oc.o}/${oc.c}`:'off',tsotMs:oc?Math.round(oc.tsot):null,openIntervals:oc?oc.intervals:null,tapsOccluded:oc?oc.taps:null};
   renderStatus();
   if(result==='success'){ $('#ovl').innerHTML=`<div class="ovl done"><div class="ck">${I('check')}</div></div>`; setTimeout(()=>$('#ovl').innerHTML='',950) }
@@ -1093,9 +1096,9 @@ async function finish(result){
   setTimeout(()=>openPanel(),result==='success'?1000:200);
 }
 const rows=()=>remote||local;
-function csv(){const H=['participant','condition','mode','layout','occlusion','task','level','result','duration_s','taps','misses','first_tap_s','tsot_s','open_intervals','taps_occluded','screens','path','started_at','lang'];
+function csv(){const H=['build','participant','condition','mode','layout','occlusion','task','level','result','duration_s','taps','misses','first_tap_s','tsot_s','open_intervals','taps_occluded','screens','path','started_at','lang'];
   const q=v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  return [H.join(','),...[...rows()].reverse().map(r=>[r.participant,r.condition,r.mode||'urban',r.layout||'deep',r.occlusion||'off',r.task,r.level,r.result,(r.durationMs/1000).toFixed(2),r.taps,r.misses,r.firstTapMs==null?'':(r.firstTapMs/1000).toFixed(2),r.tsotMs==null?'':(r.tsotMs/1000).toFixed(2),r.openIntervals??'',r.tapsOccluded??'',(r.screens||[]).join(' > '),(r.path||[]).map(p=>p.a).join(' > '),r.startedAt,r.lang].map(q).join(','))].join('\n')}
+  return [H.join(','),...[...rows()].reverse().map(r=>[r.build||'pre-2.0',r.participant,r.condition,r.mode||'urban',r.layout||'deep',r.occlusion||'off',r.task,r.level,r.result,(r.durationMs/1000).toFixed(2),r.taps,r.misses,r.firstTapMs==null?'':(r.firstTapMs/1000).toFixed(2),r.tsotMs==null?'':(r.tsotMs/1000).toFixed(2),r.openIntervals??'',r.tapsOccluded??'',(r.screens||[]).join(' > '),(r.path||[]).map(p=>p.a).join(' > '),r.startedAt,r.lang].map(q).join(','))].join('\n')}
 
 function openPanel(){ renderPanel(); $('#rp').hidden=false; }
 function closePanel(){ $('#rp').hidden=true; }
@@ -1105,7 +1108,7 @@ function renderPanel(){
     <div class="fr"><button class="rb x" data-r="abort">End as not completed</button><button class="rb" data-r="close">Back to participant</button></div></div>`:'';
   const last=R[0];
   const lastBox=!live&&last?`<div class="live"><b class="res-${last.result}">${last.task} · ${last.result} · ${(last.durationMs/1000).toFixed(1)} s · ${last.taps} taps (${last.misses} missed)${last.tsotMs!=null?` · TSOT ${(last.tsotMs/1000).toFixed(1)} s`:''}</b><span class="note">${esc(msg)}</span></div>`:'';
-  el.innerHTML=`<div class="rp" role="dialog" aria-label="Researcher panel"><header><b>Researcher</b><button class="rb" data-r="close">Close</button></header><div class="body">
+  el.innerHTML=`<div class="rp" role="dialog" aria-label="Researcher panel"><header><b>Researcher · ${BUILD.id}</b><button class="rb" data-r="close">Close</button></header><div class="body">
    ${live}${lastBox}
    <div><h4>Session</h4><div class="fr"><label>Participant<input id="rpP" value="${esc(PREF.participant)}" autocomplete="off"></label><label>Condition<input id="rpC" value="${esc(PREF.condition)}" autocomplete="off"></label></div>
    <div class="fr" style="margin-top:10px"><button class="rb ${S.lang==='fa'?'a':''}" data-r="lang" data-v="fa">UI فارسی</button><button class="rb ${S.lang==='en'?'a':''}" data-r="lang" data-v="en">UI English</button><button class="rb" data-r="reset">Reset to start state</button></div>
@@ -1116,8 +1119,8 @@ function renderPanel(){
    <p class="note" style="margin:8px 0 0">Occlusion blanks the screen in fixed cycles while touch keeps working; TSOT (total visible time to finish) is logged as a visual-demand measure. Check the interval values against ISO 16673 before you report them.</p></div>
    <div><h4>Tasks — reset to start state, show instruction, time from “Start”</h4><div class="tl">${TASKS.map(k=>`<div class="trow"><span class="c">${k.id}<div class="lv">${k.lv}</div></span><span class="d">${esc(k.fa)}</span><button class="rb a" data-r="run" data-v="${k.id}">Run</button></div>`).join('')}</div></div>
    <div><h4>Trials (${R.length}) ${remote?'· shared log':'· this device'}</h4>
-    <div class="tbw"><table><thead><tr><th>P</th><th>Task</th><th>Mode</th><th>Layout</th><th>Result</th><th>Time s</th><th>Taps</th><th>Miss</th><th>TSOT s</th></tr></thead><tbody>
-    ${R.slice(0,60).map(r=>`<tr><td>${esc(r.participant)}</td><td>${r.task}</td><td>${r.mode||'urban'}</td><td>${r.layout||'deep'}</td><td class="res-${r.result}">${r.result}</td><td>${(r.durationMs/1000).toFixed(1)}</td><td>${r.taps}</td><td>${r.misses}</td><td>${r.tsotMs==null?'—':(r.tsotMs/1000).toFixed(1)}</td></tr>`).join('')||'<tr><td colspan="9" class="note">No trials yet. Run a task above.</td></tr>'}
+    <div class="tbw"><table><thead><tr><th>Build</th><th>P</th><th>Task</th><th>Mode</th><th>Layout</th><th>Result</th><th>Time s</th><th>Taps</th><th>Miss</th><th>TSOT s</th></tr></thead><tbody>
+    ${R.slice(0,60).map(r=>`<tr><td>${esc(r.build||'pre-2.0')}</td><td>${esc(r.participant)}</td><td>${r.task}</td><td>${r.mode||'urban'}</td><td>${r.layout||'deep'}</td><td class="res-${r.result}">${r.result}</td><td>${(r.durationMs/1000).toFixed(1)}</td><td>${r.taps}</td><td>${r.misses}</td><td>${r.tsotMs==null?'—':(r.tsotMs/1000).toFixed(1)}</td></tr>`).join('')||'<tr><td colspan="10" class="note">No trials yet. Run a task above.</td></tr>'}
     </tbody></table></div>
     <div class="fr" style="margin-top:10px">${dl?'<button class="rb a" data-r="dl">Save CSV</button>':''}${!dl&&navigator.canShare?'<button class="rb a" data-r="share">Share CSV</button>':''}<button class="rb" data-r="copy">Copy CSV</button></div>
     <div id="csvbox"></div></div>
@@ -1182,7 +1185,10 @@ render();
 </script>
 
 <script>
-if('serviceWorker' in navigator && location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+if('serviceWorker' in navigator && location.protocol==='https:'){
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>{r.update();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')r.update()})}).catch(()=>{});
+  let reloaded=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(reloaded||(window.__trialRunning&&window.__trialRunning()))return;reloaded=true;location.reload()});
+}
 </script>
 </body>
 </html>
