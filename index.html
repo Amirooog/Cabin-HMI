@@ -15,7 +15,7 @@
 <title>Cabin Touch HMI</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Vazirmatn:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Vazirmatn:wght@300;400;500;700&display=swap">
 <style>
 /* Deliberately single-theme: an automotive display at night. Every colour painted explicitly. */
 :root{
@@ -36,7 +36,7 @@ svg.i{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:1.8;stro
 svg.f{fill:currentColor;stroke:none}
 .num{font-variant-numeric:tabular-nums}
 
-#app{height:100%;display:grid;grid-template-rows:46px minmax(0,1fr) 96px;background:var(--screen);border-radius:20px;overflow:hidden;position:relative;font-family:var(--fe);font-size:17px}
+#app{height:100%;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:46px minmax(0,1fr) 96px;background:var(--screen);border-radius:20px;overflow:hidden;position:relative;font-family:var(--fe);font-size:17px}
 #app[dir=rtl]{font-family:var(--ff)}
 #dim{position:absolute;inset:0;background:#000;pointer-events:none;z-index:50}
 
@@ -116,7 +116,7 @@ svg.f{fill:currentColor;stroke:none}
 .tbig .v{font-size:56px;font-weight:600;line-height:1}
 .tbig .z{font-size:14px;color:var(--tx3)}
 .seats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.cen{display:flex;flex-direction:column;gap:12px;min-height:0}
+.cen{display:flex;flex-direction:column;gap:10px;min-height:0}
 .r4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
 .fanrow{display:grid;grid-template-columns:64px 1fr 64px;gap:10px;align-items:center;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:6px}
@@ -276,19 +276,179 @@ svg.f{fill:currentColor;stroke:none}
 }
 @media (max-width:600px){ .volctl{display:none} .bar{grid-template-columns:auto 1fr auto} }
 @media (prefers-reduced-motion:reduce){ .caret,.done .ck{animation:none} }
+/* ---- v2: motion ---- */
+.enter{animation:enter .18s ease-out}
+@keyframes enter{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+#app button{transition:transform .08s ease,background-color .12s}
+#app button:active{transform:scale(.97)}
+.flow{animation:flow var(--d,1.2s) linear infinite}
+@keyframes flow{to{stroke-dashoffset:-26}}
+.glow{animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{opacity:.55}}
+/* confirmation toast */
+#toast{position:absolute;top:54px;left:50%;transform:translate(-50%,-8px);background:var(--s2);border:1px solid var(--line);border-radius:99px;padding:10px 20px;display:flex;gap:10px;align-items:center;font-weight:600;font-size:16px;z-index:30;opacity:0;transition:opacity .18s,transform .18s;pointer-events:none;white-space:nowrap}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+#toast svg.i{width:22px;height:22px;color:var(--acc)}
+/* occlusion shutter */
+#occ{position:fixed;inset:0;background:#000;z-index:90;pointer-events:none;opacity:0}
+#occ.on{opacity:1}
+/* climate v2 */
+.clim{grid-template-columns:minmax(150px,1fr) 2.4fr minmax(150px,1fr)}
+.cen .carv{flex:1;min-height:110px}
+.carv{background:radial-gradient(120% 80% at 50% 100%,#15202A,var(--s1));border:1px solid var(--line);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:8px 10px 6px;gap:2px}
+.carv svg{width:100%;flex:1;min-height:0}
+.carv .cap{font-size:13px;color:var(--tx3)}
+/* shallow layout quick buttons */
+.bar{display:flex;gap:6px}
+.bar .dock{flex:1}
+.dock button{flex:0 1 84px;min-width:54px;width:auto}
+.qb{width:60px;height:74px;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:var(--tx2);flex:none;font-size:11px;font-weight:600}
+.qb.on{color:var(--warm);background:#3A2113}
+.qb:active{background:var(--s3)}
+.qb .lv{display:flex;gap:2px}.qb .lv i{width:9px;height:3px;border-radius:2px;background:var(--s3)}.qb .lv i.a{background:currentColor}
+.bar{overflow:hidden}
+.bar.sh .tctl button{width:44px}.bar.sh .tctl .tv{min-width:76px;font-size:26px}.bar.sh .volctl button{width:48px}.bar.sh .dock button span{font-size:12px}
+.qgrp{display:flex;gap:2px;padding-inline:6px;border-inline-start:1px solid var(--line)}
+/* nav v2 */
+.nav canvas{transition:transform .6s ease}
+.nav canvas.tilt{transform:perspective(900px) rotateX(36deg) scale(2);transform-origin:50% 88%}
+.navfade{position:absolute;inset:0 0 auto 0;height:22%;background:linear-gradient(#0D1216,transparent);pointer-events:none}
+.nav:has(canvas.tilt){background:#0D1216}
+@media (max-width:900px){.carv{display:none}.qb{display:none}.qgrp{display:none}}
+@media (prefers-reduced-motion:reduce){.enter,.flow,.glow{animation:none}.nav canvas{transition:none}#app button{transition:none}}
+/* ================= v4: Scandinavian calm · frosted glass · context modes ================= */
+@property --b1{syntax:'<color>';inherits:true;initial-value:#3B3F45}
+@property --b2{syntax:'<color>';inherits:true;initial-value:#5A5750}
+@property --b3{syntax:'<color>';inherits:true;initial-value:#2C3138}
+@property --acc{syntax:'<color>';inherits:true;initial-value:#E4DED3}
+:root{
+  --screen:#0D0E11; --s1:rgba(255,255,255,.06); --s2:rgba(255,255,255,.075); --s3:rgba(255,255,255,.14); --line:rgba(255,255,255,.09);
+  --tx:#F3F1ED; --tx2:rgba(243,241,237,.64); --tx3:rgba(243,241,237,.4);
+  --acc:#E4DED3; --acc-ink:#1B1916; --acc-bg:rgba(228,222,211,.16);
+  --warm:#FF6F4E; --cold:#72B4FF;
+  --fe:"Plus Jakarta Sans","Vazirmatn",system-ui,sans-serif; --ff:"Vazirmatn","Plus Jakarta Sans",system-ui,sans-serif;
+  --dur:.2s; --ease:cubic-bezier(.2,.7,.2,1); --drift:28s;
+  --glass:blur(26px) saturate(1.35);
+}
+#app{background:var(--screen);border-radius:26px;transition:--b1 1.2s,--b2 1.2s,--b3 1.2s,--acc .6s}
+#app{--acc-bg:color-mix(in srgb,var(--acc) 17%,transparent)}
+#amb{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none}
+#amb i{position:absolute;width:75%;aspect-ratio:1;border-radius:50%;opacity:.85}
+#amb i:nth-child(1){background:radial-gradient(circle,var(--b1) 0,transparent 66%);left:-18%;top:-30%;animation:d1 var(--drift) ease-in-out infinite alternate}
+#amb i:nth-child(2){background:radial-gradient(circle,var(--b2) 0,transparent 66%);right:-22%;top:5%;animation:d2 calc(var(--drift)*1.3) ease-in-out infinite alternate}
+#amb i:nth-child(3){background:radial-gradient(circle,var(--b3) 0,transparent 66%);left:18%;bottom:-45%;animation:d3 calc(var(--drift)*.9) ease-in-out infinite alternate}
+@keyframes d1{to{transform:translate(14%,10%) scale(1.08)}}
+@keyframes d2{to{transform:translate(-12%,14%) scale(.92)}}
+@keyframes d3{to{transform:translate(10%,-12%) scale(1.1)}}
+.status,#main,.bar{position:relative;z-index:1}
+/* glass surfaces */
+.card,.bar,.tbig,.fanrow,.pill,.navcard,.srch,.sheet,.zoom button,#toast,#vtoast,.carv,.modesheet .mcardm{
+  background:var(--s1);border:1px solid var(--line);-webkit-backdrop-filter:var(--glass);backdrop-filter:var(--glass);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 10px 30px rgba(0,0,0,.18)}
+.bar{background:rgba(255,255,255,.045);border-width:1px 0 0;box-shadow:none}
+.card{border-radius:24px}
+.tile,.btn,.key,.mctl button,.bigctl button,.srcbtn,.qbox,.qrow>button,.bri button,.seg{border-radius:18px}
+.tile{background:var(--s2)}
+.tile.on{background:var(--acc-bg);color:var(--acc);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--acc) 70%,transparent)}
+.tile.warm.on,.qb.on{background:rgba(255,111,78,.16);color:var(--warm);box-shadow:inset 0 0 0 1.5px rgba(255,111,78,.6)}
+.dock button.on{background:var(--acc-bg);color:var(--acc)}
+.btn.pri{background:var(--acc);color:var(--acc-ink)}
+.btn.pri:active{filter:brightness(1.1);background:var(--acc)}
+.bigctl button.pp{background:var(--acc);color:var(--acc-ink)}
+.segs button.a::after{background:var(--acc)}
+.caret{background:var(--acc)}
+.row.on{background:var(--acc-bg)}
+.navpill{color:var(--acc)}
+.man{background:color-mix(in srgb,var(--acc) 88%,#000);color:var(--acc-ink)}
+.callscr{background:rgba(8,9,11,.55);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}
+.carv{background:var(--s1)}
+/* calm type */
+#app{font-weight:400;letter-spacing:.005em}
+.tbig .v{font-weight:300;font-size:60px;letter-spacing:-.02em}
+.tctl .tv{font-weight:400}
+.ccard .big{font-weight:300;font-size:46px}
+.freq{font-weight:300}
+.mt{font-weight:600;letter-spacing:-.01em}
+.h{font-weight:600;font-size:12px;letter-spacing:.12em;color:var(--tx3)}
+.navcard .t1{font-weight:600}
+.status{font-size:15px}
+#clock{font-weight:600}
+/* motion character from mode */
+.enter{animation:enter calc(var(--dur)*1.3) var(--ease)}
+#app button{transition:transform var(--dur) var(--ease),background-color var(--dur)}
+#toast{transition:opacity var(--dur),transform var(--dur) var(--ease)}
+/* mode pill + sheet */
+.modepill{display:flex;align-items:center;gap:8px;padding:7px 14px 7px 12px;border-radius:99px;background:var(--acc-bg);color:var(--acc);font-weight:600;font-size:14px}
+.modepill svg.i{width:18px;height:18px}
+.modepill .lk{opacity:.7}
+.msheet-bg{position:absolute;inset:0;z-index:20;background:rgba(6,7,9,.62);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:24px}
+.modesheet{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;width:min(1000px,100%)}
+.mcardm{border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;text-align:start;min-height:210px;position:relative;overflow:hidden}
+.mcardm .sw{height:64px;border-radius:16px}
+.mcardm b{font-size:20px;font-weight:600}
+.mcardm span{color:var(--tx2);font-size:14px;line-height:1.5}
+.mcardm.on{box-shadow:inset 0 0 0 2px var(--mc)}
+.mcardm svg.i{color:var(--mc)}
+/* home layouts per mode */
+.home{display:grid;gap:14px;flex:1;min-height:0}
+.home.m-urban{grid-template-columns:1.75fr 1fr}
+.home.m-open{grid-template-columns:1fr 1fr}
+.home.m-freeway{grid-template-columns:1fr 1.5fr}
+.home.m-carpool{grid-template-columns:1fr 1fr}
+.stack{display:flex;flex-direction:column;gap:14px;min-height:0}
+.stack>.grow{flex:1;min-height:0}
+.bigmedia{padding:22px;display:flex;flex-direction:column;gap:16px;justify-content:space-between}
+.bigmedia .art{align-self:center;width:100%;height:auto;aspect-ratio:1;max-height:min(260px,34vh);max-width:min(260px,34vh);border-radius:20px}
+.bigmedia .mt{font-size:26px}
+.fw{padding:24px;display:flex;flex-direction:column;gap:18px;justify-content:center}
+.fw .spd{font-size:88px;font-weight:300;line-height:1;letter-spacing:-.03em}
+.fw .spd small{font-size:20px;color:var(--tx3);font-weight:500;letter-spacing:0}
+.fw .row2{display:flex;gap:18px;align-items:center}
+.limit{width:74px;height:74px;border-radius:50%;background:#F3F1ED;border:7px solid #E0463A;color:#111;display:grid;place-items:center;font-weight:700;font-size:24px;flex:none}
+.fw .ex b{display:block;font-size:22px;font-weight:600}
+.fw .ex span{color:var(--tx2)}
+.pass{padding:18px;display:flex;flex-direction:column;gap:12px;min-height:0}
+.pass .ph2{display:flex;align-items:center;justify-content:space-between}
+.pass .ptemp{display:flex;align-items:center;gap:6px}
+.pass .ptemp button{width:56px;height:56px;border-radius:16px;background:var(--s2);display:grid;place-items:center}
+.pass .ptemp .v{font-size:34px;font-weight:300;min-width:92px;text-align:center}
+.pass .qrow2{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.pass .qrow2 .tile{min-height:78px}
+.pass .plist{flex:1;min-height:0}
+.journey{padding:18px 20px;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:center}
+.journey b{display:block;font-size:24px;font-weight:600}
+.journey span{color:var(--tx3);font-size:13px}
+@media (max-width:900px){.home.m-urban,.home.m-open,.home.m-freeway,.home.m-carpool{grid-template-columns:1fr}.home .stack:not(:first-child){display:none}.modesheet{grid-template-columns:1fr 1fr}}
+@media (prefers-reduced-motion:reduce){#amb i{animation:none}}
+
+/* v5: temperature wheel + icon-only tiles */
+.tbig{justify-content:flex-start;gap:4px;padding:10px 8px}
+.wwrap{position:relative;flex:1;min-height:0;width:100%;display:flex}
+.wwrap::before{content:"";position:absolute;inset-inline:6px;top:50%;height:64px;transform:translateY(-50%);border-radius:18px;background:var(--s2);border:1px solid var(--line);pointer-events:none}
+.wheel{position:relative;flex:1;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none;perspective:520px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;
+  -webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);touch-action:pan-y}
+.wheel::-webkit-scrollbar{display:none}
+.wi{height:64px;display:grid;place-items:center;font-size:40px;font-weight:300;letter-spacing:-.02em;scroll-snap-align:center;scroll-snap-stop:normal;color:var(--tx2);cursor:pointer;will-change:transform,opacity;transform-origin:50% 50%}
+.wi.sel{color:var(--wc,var(--tx));font-weight:400}
+.tile.io{gap:8px}
+.tile.io svg.i{width:32px;height:32px}
+@media (prefers-reduced-motion:reduce){.wi{transition:none}}
 </style>
 </head>
 <body>
 
 
 <div id="app" dir="rtl">
+  <div id="amb" aria-hidden="true"><i></i><i></i><i></i></div>
   <div class="status" id="status"></div>
   <div id="main"></div>
   <div class="bar" id="bar" dir="ltr"></div>
   <div id="vtoast" style="opacity:0"></div>
+  <div id="toast" role="status" aria-live="polite"></div>
   <div id="dim" style="opacity:0"></div>
 </div>
 <div id="ovl"></div>
+<div id="occ"></div>
 <div id="rp" hidden></div>
 
 <script>
@@ -334,6 +494,7 @@ sun:'M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 2v2M12 20v2M4 12H2M22 12h-2M5 5l1.5 
 fFace:'M7 4.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM8.5 8v6h4l2 6M8.5 11h3M21 8h-6M17 6l-2 2 2 2',
 fFeet:'M7 4.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM8.5 8v6h4l2 6M8.5 11h3M22 19h-5M19 17l-2 2 2 2',
 fBoth:'M7 4.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM8.5 8v6h4l2 6M8.5 11h3M21 8h-6M17 6l-2 2 2 2M22 19h-5M19 17l-2 2 2 2',
+city:'M3 21h18M5 21V10l5-3v14M10 21V4l9 4v13M13.5 11h2M13.5 15h2M7 13h1M7 17h1',road:'M4 21L10 3M20 21L14 3M12 5v2M12 11v2.5M12 17.5v3',lanes:'M3 21L8 3M21 21L16 3M9 21l.7-4M11.2 12l.4-3M12.6 6l.2-2M15 21l-.7-4M12.8 12l-.4-3',people:'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM2.5 20a6.5 6.5 0 0 1 13 0M16 4.5a3.5 3.5 0 0 1 0 6.5M18 14a6 6 0 0 1 3.5 6',lock:'M6 11h12v10H6zM8.5 11V8a3.5 3.5 0 0 1 7 0v3',seatH:'M7 3c1 0 2 1 2 2l1 9h7a2 2 0 0 1 2 2v2H9a2 2 0 0 1-2-1.6L5 6c-.2-1.6.7-3 2-3zM9 18v3M17 18v3M13.5 3c-.9 1.2.9 2.4 0 3.6s.9 2.4 0 3.6M17 3c-.9 1.2.9 2.4 0 3.6s.9 2.4 0 3.6M20.5 3c-.9 1.2.9 2.4 0 3.6s.9 2.4 0 3.6',seatV:'M7 3c1 0 2 1 2 2l1 9h7a2 2 0 0 1 2 2v2H9a2 2 0 0 1-2-1.6L5 6c-.2-1.6.7-3 2-3zM9 18v3M17 18v3M17 2.5v7M14 4.2l6 3.6M20 4.2l-6 3.6',
 fWind:'M7 4.5a1.5 1.5 0 1 0 3 0 1.5 1.5 0 0 0-3 0zM8.5 8v6h4l2 6M8.5 11h3M14 2l7 7M22 19h-5M19 17l-2 2 2 2'
 };
 const FILLED={play:'M7 4l13 8-13 8z',pause:'M6 4h4v16H6zM14 4h4v16h-4z'};
@@ -359,11 +520,12 @@ space:['space','فاصله'],
 display:['Display brightness','روشنایی نمایشگر'],language:['Language','زبان'],tsound:['Touch sound','صدای لمس'],on:['On','روشن'],off:['Off','خاموش'],
 about:['Touch-only baseline prototype · v1.0','نمونه اولیه مرجع — فقط لمسی · نسخه ۱٫۰'],
 range:['Range','برد باقی‌مانده'],odo:['Trip','مسافت سفر'],cons:['Avg. consumption','میانگین مصرف'],outside:['Outside','دمای بیرون'],
-vol:['Volume','صدا']
+vol:['Volume','صدا'],level:['Level','سطح'],driveMode:['Drive mode','حالت رانندگی'],locked:['Drive mode is locked during the test','حالت رانندگی در طول آزمون قفل است'],arrived:['You have arrived','به مقصد رسیدید'],done:['Done','پایان'],nextTrack:['Next','بعدی']
 };
 const t=k=>{const e=D[k];return e?e[S.lang==='fa'?1:0]:k};
 const nm=o=>o[S.lang]||o.en;
 const FAD='۰۱۲۳۴۵۶۷۸۹';
+const SEP=h=>S.lang==='fa'?h.replace(/ · /g,'، '):h;
 const N=v=>{const s=String(v);return S.lang==='fa'?s.replace(/\d/g,d=>FAD[d]).replace(/\./g,'٫'):s};
 
 /* ---------- content ---------- */
@@ -423,13 +585,13 @@ const TASKS=[
 
 /* ---------- prefs & state ---------- */
 const store={get(k,d){try{const v=localStorage.getItem('hmi.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('hmi.'+k,JSON.stringify(v))}catch(e){}}};
-const PREF=store.get('pref',{lang:'fa',bright:100,click:true,participant:'P01',condition:'iPad-touch-baseline'});
+const PREF=Object.assign({lang:'fa',bright:100,click:true,participant:'P01',condition:'iPad-touch-baseline',layout:'deep',mode:'urban',occ:{on:false,open:1500,closed:1500}},store.get('pref',{}));
 function fresh(){return{
-  lang:PREF.lang,screen:'home',sheet:null,
+  lang:PREF.lang,screen:'home',sheet:null,mode:PREF.mode||'urban',
   clim:{dT:22,pT:22,fan:3,auto:false,ac:true,recirc:false,sync:false,mode:'face',prevMode:'face',fDef:false,rDef:false,seatL:0,seatR:0,ventL:0,ventR:0,wheel:false},
   media:{src:'bt',playing:true,track:0,pos:37,usb:0,upos:0,vol:14,mute:false,fm:1,freq:95.5},
   phone:{tab:'recents',open:null,dial:'',call:null,rec:[{cid:'mom',k:'incoming',w:{en:'10:12',fa:'۱۰:۱۲'}},{cid:'office',k:'outgoing',w:{en:'Yesterday',fa:'دیروز'}},{cid:'ali',k:'missed',w:{en:'Yesterday',fa:'دیروز'}},{cid:'kaveh',k:'outgoing',w:{en:'Monday',fa:'دوشنبه'}},{cid:'parisa',k:'incoming',w:{en:'Sunday',fa:'یکشنبه'}}]},
-  nav:{mode:'idle',q:'',kb:PREF.lang,sel:null,dest:null,zoom:1,t0:0}
+  nav:{mode:'idle',q:'',kb:PREF.lang,sel:null,dest:null,zoom:1,t0:0,prog:0,rot:-0.2,leg:1}
 }}
 let S=fresh();
 const savePref=()=>store.set('pref',PREF);
@@ -447,22 +609,26 @@ const A=(a,v)=>`data-a="${a}"${v!==undefined?` data-v="${v}"`:''}`;
 const norm=s=>s.toLowerCase().replace(/ي/g,'ی').replace(/ك/g,'ک').replace(/‌/g,' ').trim();
 
 /* ---------- render ---------- */
+let enterCls='',lastScreen=null;
 function render(){
+  enterCls=S.screen!==lastScreen?' enter':'';lastScreen=S.screen;applyMode();
   const app=$('#app'); app.dir=S.lang==='fa'?'rtl':'ltr'; app.lang=S.lang;
   $('#dim').style.opacity=(1-PREF.bright/100)*0.7;
   renderStatus(); renderBar();
   const m=$('#main'); const sc={}; m.querySelectorAll('[data-scroll]').forEach(e=>sc[e.dataset.scroll]=e.scrollTop);
-  m.innerHTML=({home,nav,media,phone,climate,settings})[S.screen]()+(S.phone.call?callScreen():'');
+  m.innerHTML=SEP(({home,nav,media,phone,climate,settings})[S.screen]()+(S.phone.call?callScreen():'')+(S.sheet==='mode'?modeSheet():''));
   m.querySelectorAll('[data-scroll]').forEach(e=>{if(sc[e.dataset.scroll]!=null)e.scrollTop=sc[e.dataset.scroll]});
   m.querySelectorAll('canvas[data-map]').forEach(drawMap);
+  initWheels(m);
 }
 function renderStatus(){
   const now=new Date(); const hm=N(now.getHours()+':'+String(now.getMinutes()).padStart(2,'0'));
   let mid='';
   if(S.phone.call){const c=S.phone.call;mid=`<button class="callpill" ${A('go','phone')}>${I('phone')}<span>${esc(c.name)}</span><span class="num" id="ctime2">${callStatus()}</span></button>`}
-  else if(S.nav.mode==='route'&&S.screen!=='nav'){const r=route();mid=`<button class="navpill" ${A('go','nav')}>${I('nav')}<span>${esc(nm(PB[S.nav.dest]))} · ${N(r.min)} ${t('min')}</span></button>`}
-  $('#status').innerHTML=`<div id="clock" data-nolog>${trial&&trial.running?'<i class="rec"></i>':''}<span class="num">${hm}</span></div><div>${mid}</div>
-  <div class="st-r"><span>${t('outside')} ${N(27)}°</span>${I('bt')}${I('signal')}<span class="av" style="width:30px;height:30px;font-size:13px">${S.lang==='fa'?'ا':'A'}</span></div>`;
+  else if(S.nav.mode==='route'&&S.screen!=='nav'){const r=route();mid=`<button class="navpill" ${A('go','nav')}>${I('nav')}<span>${esc(nm(PB[S.nav.dest]))} · <b id="npMin">${N(r.min)}</b> ${t('min')}</span></button>`}
+  if(!mid){const md=MODES[S.mode];mid=`<button class="modepill" ${A('modesheet')} aria-label="${t('driveMode')}">${I(md.icon)}<span>${nm(md)}</span>${trial&&trial.running?I('lock','lk'):''}</button>`}
+  $('#status').innerHTML=SEP(`<div id="clock" data-nolog>${trial&&trial.running?'<i class="rec"></i>':''}<span class="num">${hm}</span></div><div>${mid}</div>
+  <div class="st-r"><span>${t('outside')} ${N(27)}°</span>${I('bt')}${I('signal')}<span class="av" style="width:30px;height:30px;font-size:13px">${S.lang==='fa'?'ا':'A'}</span></div>`);
 }
 function tctl(side){const v=side==='d'?S.clim.dT:S.clim.pT;
   return `<div class="tctl"><button ${A('temp',side+'-')} aria-label="${t(side==='d'?'driver':'passenger')} −">${I('left')}</button>
@@ -470,63 +636,153 @@ function tctl(side){const v=side==='d'?S.clim.dT:S.clim.pT;
   <button ${A('temp',side+'+')} aria-label="${t(side==='d'?'driver':'passenger')} +">${I('right')}</button></div>`}
 function renderBar(){
   const d=(k,ic,extra='')=>`<button class="${S.screen===k?'on':''}" ${A('go',k)}>${I(ic)}<span>${t(k)}</span>${extra}</button>`;
-  const m=S.media;
-  $('#bar').innerHTML=`${tctl('d')}
-  <div class="dock" dir="${S.lang==='fa'?'rtl':'ltr'}">${d('home','home')}${d('nav','nav')}${d('media','music')}${d('phone','phone')}${d('climate','fan',`<b class="badge num">${S.clim.auto?'A':N(S.clim.fan)}</b>`)}${d('settings','gear')}</div>
-  <div class="volctl"><button ${A('vol','-')} aria-label="${t('vol')} −">${I('minus')}</button>
+  const m=S.media, c=S.clim, sh=PREF.layout==='shallow';
+  const lv=n=>`<span class="lv">${[1,2,3].map(i=>`<i class="${n>=i?'a':''}"></i>`).join('')}</span>`;
+  const qs=L=>sh?`<button class="qb ${c['seat'+L]?'on':''}" ${A('seat','seat'+L)} aria-label="${t('seatHeat')}">${I('seatH')}${lv(c['seat'+L])}</button>`:'';
+  const qd=sh?`<div class="qgrp"><button class="qb ${c.fDef?'on':''}" ${A('tog','fDef')} aria-label="${t('fDef')}">${I('defF')}<span>${S.lang==='fa'?'جلو':'Front'}</span></button><button class="qb ${c.rDef?'on':''}" ${A('tog','rDef')} aria-label="${t('rDef')}">${I('defR')}<span>${S.lang==='fa'?'عقب':'Rear'}</span></button></div>`:'';
+  $('#bar').classList.toggle('sh',sh);
+  $('#bar').innerHTML=`${qs('L')}${tctl('d')}
+  <div class="dock" dir="${S.lang==='fa'?'rtl':'ltr'}">${d('home','home')}${d('nav','nav')}${d('media','music')}${d('phone','phone')}${d('climate','fan',`<b class="badge num">${c.auto?'A':N(c.fan)}</b>`)}${d('settings','gear')}</div>
+  ${qd}<div class="volctl"><button ${A('vol','-')} aria-label="${t('vol')} −">${I('minus')}</button>
   <button class="vn" ${A('vol','mute')}>${I(m.mute?'mute':'vol')}<span class="num">${m.mute?'—':N(m.vol)}</span></button>
   <button ${A('vol','+')} aria-label="${t('vol')} +">${I('plus')}</button></div>
-  ${tctl('p')}`;
+  ${tctl('p')}${qs('R')}`;
 }
 
-function home(){
-  const m=S.media, tr=cur(), st=FMS[m.fm];
+const MODES={
+ urban:{en:'Urban',fa:'شهری',acc:'#E4DED3',ink:'#1B1916',b:['#4B5059','#6E675C','#2A2F37'],drift:28,dur:.2,ease:'cubic-bezier(.2,.7,.2,1)',icon:'city',
+   d:{en:'Navigation first. Fewer distractions in dense traffic.',fa:'اولویت با ناوبری؛ حواس‌پرتی کمتر در ترافیک شهری.'}},
+ open:{en:'Open road',fa:'جاده‌ی باز',acc:'#F4B870',ink:'#2A1A08',b:['#8E5626','#4C2E1C','#B8793A'],drift:40,dur:.34,ease:'cubic-bezier(.16,1,.3,1)',icon:'road',
+   d:{en:'Room for music and the journey ahead.',fa:'فضای بیشتر برای موسیقی و مسیر پیش رو.'}},
+ freeway:{en:'Freeway',fa:'آزادراه',acc:'#B3A7FF',ink:'#15112E',b:['#332B68','#4F3F8A','#1B2046'],drift:70,dur:.12,ease:'cubic-bezier(.3,.6,.3,1)',icon:'lanes',
+   d:{en:'The quietest screen. Only what matters at speed.',fa:'آرام‌ترین صفحه؛ فقط آنچه در سرعت بالا لازم است.'}},
+ carpool:{en:'Carpool',fa:'هم‌سفری',acc:'#FFBFA6',ink:'#2E140C',b:['#8A4640','#53304C','#C47A62'],drift:24,dur:.28,ease:'cubic-bezier(.34,1.45,.64,1)',icon:'people',
+   d:{en:'The passenger side opens up for media and comfort.',fa:'سمت سرنشین برای رسانه و آسایش باز می‌شود.'}}
+};
+function applyMode(){const m=MODES[S.mode]||MODES.urban, a=$('#app');a.dataset.mode=S.mode;
+  a.style.setProperty('--acc',m.acc);a.style.setProperty('--acc-ink',m.ink);
+  ['--b1','--b2','--b3'].forEach((k,i)=>a.style.setProperty(k,m.b[i]));
+  a.style.setProperty('--drift',m.drift+'s');a.style.setProperty('--dur',m.dur+'s');a.style.setProperty('--ease',m.ease);
+  const mc=document.querySelector('meta[name=theme-color]');if(mc)mc.content='#050607'}
+function modeSheet(){const locked=trial&&trial.running;
+  return `<div class="msheet-bg" ${A('closesheet')}><div class="modesheet">${Object.entries(MODES).map(([k,m])=>`<button class="mcardm ${S.mode===k?'on':''}" style="--mc:${m.acc}" ${A('setmode',k)}>
+    <div class="sw" style="background:radial-gradient(120% 140% at 0% 0%,${m.b[1]},${m.b[0]} 45%,${m.b[2]})"></div>
+    <div style="display:flex;align-items:center;gap:10px">${I(m.icon)}<b>${nm(m)}</b></div><span>${esc(nm(m.d))}</span></button>`).join('')}</div></div>`}
+
+function mediaCompact(){const m=S.media,tr=cur(),st=FMS[m.fm];
   const art=m.src==='fm'?`<div class="art" style="background:var(--s3);display:grid;place-items:center;color:var(--tx2)">${I('radio')}</div>`:`<div class="art" style="${artBg(tr.h)}"></div>`;
   const title=m.src==='fm'?`${N(m.freq.toFixed(1))} FM`:esc(tr.t), sub=m.src==='fm'?esc(nm(st)):esc(tr.a);
-  const r=S.nav.mode==='route'?route():null;
-  const c=S.clim, modeIc={face:'fFace',feet:'fFeet',both:'fBoth',wind:'fWind'}[c.mode];
-  return `<div class="scr"><div class="home">
-   <div class="card mapcard" role="button" ${A('go','nav')}><canvas data-map="mini"></canvas>
-    <div class="mapover"><div class="pill">${r?I('nav')+`<span>${esc(nm(PB[S.nav.dest]))} · ${N(r.min)} ${t('min')}</span>`:I('search')+`<span>${t('whereTo')}</span>`}</div></div></div>
-   <div class="col">
-    <div class="card mcard"><div role="button" ${A('go','media')}>${art}</div>
-      <div style="min-width:0"><div role="button" ${A('go','media')}><div class="mt">${title}</div><div class="ma">${sub}</div></div>
-      <div class="mctl" dir="ltr"><button ${A('mprev')} aria-label="previous">${I('prev')}</button><button ${A('mplay')} aria-label="play pause">${I(m.playing?'pause':'play')}</button><button ${A('mnext')} aria-label="next">${I('next')}</button></div></div></div>
-    <div class="card ccard" role="button" ${A('go','climate')}>
-      <div><div class="h">${t('climate')}</div><div class="big num" style="color:${tempCol(c.dT)}">${tempFmt(c.dT)}°</div></div>
-      <div class="meta">${I('fan')}<span class="num">${c.auto?t('auto'):N(c.fan)}</span>${I(modeIc)}${c.ac?I('snow'):''}${c.fDef?I('defF'):''}${c.rDef?I('defR'):''}</div></div>
-    <div class="card trip">
-      <div><b class="num">${N(412)} <small style="font-size:15px">${t('km')}</small></b><span>${t('range')}</span></div>
-      <div><b class="num">${N(18.6)} <small style="font-size:15px">${t('km')}</small></b><span>${t('odo')}</span></div>
-      <div><b class="num">${N(16.2)}</b><span>${t('cons')} (kWh/100km)</span></div>
-      <div><b class="num">${N(27)}°</b><span>${t('outside')}</span></div>
-    </div>
-   </div></div></div>`;
+  return `<div class="card mcard"><div role="button" ${A('go','media')}>${art}</div>
+    <div style="min-width:0"><div role="button" ${A('go','media')}><div class="mt">${title}</div><div class="ma">${sub}</div></div>
+    <div class="mctl" dir="ltr"><button ${A('mprev')} aria-label="previous">${I('prev')}</button><button ${A('mplay')} aria-label="play pause">${I(m.playing?'pause':'play')}</button><button ${A('mnext')} aria-label="next">${I('next')}</button></div></div></div>`}
+function mediaLarge(){const m=S.media,tr=cur(),st=FMS[m.fm],fm=m.src==='fm';const pos=m.src==='usb'?m.upos:m.pos;
+  return `<div class="card bigmedia"><div role="button" ${A('go','media')} style="display:flex;flex-direction:column;gap:16px;min-height:0">
+    ${fm?`<div class="art" style="background:var(--s3);display:grid;place-items:center;color:var(--tx2)">${I('radio')}</div>`:`<div class="art" style="${artBg(tr.h)}"></div>`}
+    <div><div class="mt">${fm?N(m.freq.toFixed(1))+' FM':esc(tr.t)}</div><div class="ma" style="font-size:17px">${fm?esc(nm(st)):esc(tr.a)}</div></div></div>
+    ${fm?'':`<div dir="ltr"><div class="prog"><i id="pbar" style="width:${pos/tr.d*100}%"></i></div><div class="times num"><span id="ptime">${mmss(pos)}</span><span>${mmss(tr.d)}</span></div></div>`}
+    <div class="bigctl" dir="ltr"><button ${A('mprev')} aria-label="previous">${I('prev')}</button><button class="pp" ${A('mplay')} aria-label="play pause">${I(m.playing?'pause':'play')}</button><button ${A('mnext')} aria-label="next">${I('next')}</button></div></div>`}
+function climCompact(side='d'){const c=S.clim,v=side==='d'?c.dT:c.pT,modeIc={face:'fFace',feet:'fFeet',both:'fBoth',wind:'fWind'}[c.mode];
+  return `<div class="card ccard" role="button" ${A('go','climate')}>
+    <div><div class="h">${t('climate')}</div><div class="big num" style="color:${tempCol(v)}">${tempFmt(v)}°</div></div>
+    <div class="meta">${I('fan')}<span class="num">${c.auto?t('auto'):N(c.fan)}</span>${I(modeIc)}${c.ac?I('snow'):''}${c.fDef?I('defF'):''}${c.rDef?I('defR'):''}</div></div>`}
+function mapCard(){const r=S.nav.mode==='route'?route():null;
+  return `<div class="card mapcard grow" role="button" ${A('go','nav')}><canvas data-map="mini"></canvas>
+    <div class="mapover"><div class="pill">${r?I(r.turn==='R'?'turnR':r.turn==='L'?'turnL':'pin')+`<span>${esc(manText(r).join(' '))}</span>`:I('search')+`<span>${t('whereTo')}</span>`}</div></div></div>`}
+function journey(){const r=S.nav.mode==='route'?route():null;
+  return `<div class="card journey">${r?`<div><b class="num">${N(r.arr)}</b><span>${t('arrive')}</span></div><div><b class="num">${N(r.min)}</b><span>${t('min')}</span></div><div><b class="num">${N(r.km)}</b><span>${t('km')}</span></div>`
+   :`<div><b class="num">${N(412)}</b><span>${t('range')} · ${t('km')}</span></div><div><b class="num">${N(18.6)}</b><span>${t('odo')} · ${t('km')}</span></div><div><b class="num">${N(16.2)}</b><span>kWh/100km</span></div>`}</div>`}
+function freewayCard(){const r=S.nav.mode==='route'?route():null;
+  return `<div class="card fw grow"><div class="row2"><div class="limit num">${N(120)}</div><div class="spd num">${N(108)}<small> km/h</small></div></div>
+    <div class="ex">${r?`<b>${esc(manText(r).join(' '))}</b><span>${esc(nm(PB[S.nav.dest]))} · ${N(r.min)} ${t('min')}</span>`:`<b>${S.lang==='fa'?'خروجی بعدی: چمران':'Next exit: Chamran'}</b><span>${S.lang==='fa'?'۴٫۲ کیلومتر · نگه‌دارنده‌ی خط فعال':'4.2 km · Lane keeping on'}</span>`}</div></div>`}
+function passengerPanel(){const c=S.clim,m=S.media;const lv=n=>`<span class="lv">${[1,2,3].map(i=>`<i class="${n>=i?'a':''}"></i>`).join('')}</span>`;
+  const list=m.src==='usb'?USB:TRACKS, idx=m.src==='usb'?m.usb:m.track;
+  return `<div class="card pass grow"><div class="ph2"><span class="h">${t('passenger')}</span>
+    <div class="ptemp" dir="ltr"><button ${A('temp','p-')} aria-label="−">${I('minus')}</button><span class="v num" style="color:${tempCol(c.pT)}">${tempFmt(c.pT)}°</span><button ${A('temp','p+')} aria-label="+">${I('plus')}</button></div></div>
+    <div class="qrow2"><button class="tile io warm ${c.seatR?'on':''}" ${A('seat','seatR')} aria-label="${t('seatHeat')}">${I('seatH')}${lv(c.seatR)}</button><button class="tile io ${c.ventR?'on':''}" ${A('seat','ventR')} aria-label="${t('seatVent')}">${I('seatV')}${lv(c.ventR)}</button><button class="tile" ${A('msrc')}>${I({bt:'bt',fm:'radio',usb:'usb'}[m.src])}<span>${t(m.src)}</span></button></div>
+    ${m.src==='fm'?`<div class="presets">${FMS.slice(0,4).map((s,i)=>`<button class="tile ${Math.abs(m.freq-s.f)<.05?'on':''}" ${A('fmpre',i)}><b class="num">${N(s.f.toFixed(1))}</b><span>${esc(nm(s))}</span></button>`).join('')}</div>`
+    :`<div class="scroll plist" data-scroll="plist">${list.map((s,i)=>`<button class="row ${i===idx?'on':''}" ${A('mtrack',i)}><div class="art" style="${artBg(s.h)}"></div><div class="gr"><div class="t1">${esc(s.t)}</div><div class="t2">${esc(s.a)}</div></div></button>`).join('')}</div>`}</div>`}
+function home(){
+  const k=S.mode; let body;
+  if(k==='open') body=`${mediaLarge()}<div class="stack">${mapCard()}${journey()}${climCompact()}</div>`;
+  else if(k==='freeway') body=`<div class="stack">${freewayCard()}${climCompact()}</div><div class="stack">${mapCard()}</div>`;
+  else if(k==='carpool'){const dd=S.lang==='fa'?'rtl':'ltr';body=`<div class="stack" dir="${dd}">${mapCard()}${climCompact()}</div><div class="stack" dir="${dd}">${passengerPanel()}</div>`}
+  else body=`<div class="stack">${mapCard()}</div><div class="stack">${mediaCompact()}${climCompact()}${journey()}</div>`;
+  return `<div class="scr${enterCls}"><div class="home m-${k}" ${k==='carpool'?'dir="ltr"':''}>${body}</div>${S.sheet==='src'?srcSheet():''}</div>`;
 }
 
+function carSVG(){
+  const c=S.clim, col=c.dT<21?'#72B4FF':c.dT>23.5?'#FF6F4E':'#E9E4DA';
+  const dur=(2.0-c.fan*0.2).toFixed(2)+'s', m=c.auto?'both':c.mode;
+  const face=m==='face'||m==='both', feet=m!=='face', wind=m==='wind';
+  const lvA=[0,.35,.62,.92];
+  const seatFill=c.seatL?`rgba(255,111,78,${lvA[c.seatL]})`:c.ventL?`rgba(114,180,255,${lvA[c.ventL]})`:'rgba(255,255,255,.14)';
+  const fl=(d,on)=>on?`<path d="${d}" class="flow" style="--d:${dur};stroke:${col}" fill="none" stroke-width="3.2" stroke-dasharray="7 6" stroke-linecap="round" marker-end="url(#ah)"/>`:'';
+  const warm='#FF6F4E';
+  const waves=(x,y)=>[0,1,2].map(i=>`<path d="M${x+i*7} ${y} q3 -5 0 -10 q-3 -5 0 -10" fill="none" stroke="${warm}" stroke-width="1.8" stroke-linecap="round" class="glow"/>`).join('');
+  return `<svg viewBox="0 0 360 200" role="img" aria-label="${t('climate')}">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4.5" markerHeight="4.5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:${col}"/></marker>
+  <marker id="ahg" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5D6B77"/></marker></defs>
+  <path d="M18 146V122q2-16 34-22l56-8 38-36q10-10 26-10h90q16 0 28 12l32 34q20 6 22 24v24q0 8-8 8H18z" fill="rgba(255,255,255,.05)" stroke="rgba(255,255,255,.22)" stroke-width="1.6"/>
+  <path d="M116 90l34-34q6-6 18-6h96q12 0 22 10l28 30z" fill="rgba(0,0,0,.28)"/>
+  <path d="M214 50v40" stroke="#33424E" stroke-width="3"/>
+  <path d="M110 92l38-38" stroke="${c.fDef?warm:'#3A4D5C'}" stroke-width="${c.fDef?6:4}" stroke-linecap="round" ${c.fDef?`style="filter:drop-shadow(0 0 6px ${warm})"`:''}/>
+  <path d="M290 58l32 34" stroke="${c.rDef?warm:'#3A4D5C'}" stroke-width="${c.rDef?6:4}" stroke-linecap="round" ${c.rDef?`style="filter:drop-shadow(0 0 6px ${warm})"`:''}/>
+  ${c.fDef?waves(92,60):''}${c.rDef?waves(318,58):''}
+  <path d="M248 122h42v8h-44z M284 126l14-52q2-6 8-4l2 2q3 2 2 7l-12 49z" fill="rgba(255,255,255,.12)"/>
+  <path d="M112 96h38l6 14-38 2z" fill="rgba(255,255,255,.12)"/>
+  <path d="M142 98l12-16" stroke="#33424E" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="157" cy="80" rx="3.5" ry="13" transform="rotate(-24 157 80)" fill="none" stroke="${c.wheel?warm:'#56697A'}" stroke-width="4" ${c.wheel?`style="filter:drop-shadow(0 0 4px ${warm})"`:''}/>
+  <path d="M160 122h46q4 0 4 4v4h-52z M200 126l14-56q2-6 8-4l2 1q4 2 3 8l-13 53z" fill="${seatFill}" ${c.seatL||c.ventL?'class="glow"':''}/>
+  <path d="M208 72q-5 24-8 46h-38l-10 22" fill="none" stroke="#5D6B77" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".55"/>
+  <circle cx="210" cy="62" r="8" fill="#5D6B77" opacity=".55"/>
+  <circle cx="74" cy="148" r="22" fill="#0B0F13" stroke="#33424E" stroke-width="3"/><circle cx="74" cy="148" r="8" fill="#26313B"/>
+  <circle cx="292" cy="148" r="22" fill="#0B0F13" stroke="#33424E" stroke-width="3"/><circle cx="292" cy="148" r="8" fill="#26313B"/>
+  ${c.recirc?`<path d="M246 70a14 14 0 1 1-8 12" fill="none" stroke="#5CC3E6" stroke-width="2.5" marker-end="url(#ahg)" stroke-linecap="round"/>`
+    :`<path d="M24 108c30-6 60-8 86-8" class="flow" style="--d:${dur}" fill="none" stroke="#5D6B77" stroke-width="2" stroke-dasharray="5 6" marker-end="url(#ahg)"/>`}
+  ${fl('M156 98c16-8 30-18 42-26',face)}${fl('M146 112c2 12 4 20 8 26',feet)}${fl('M138 94c-4-10-4-22 2-32',wind)}
+  </svg>`;
+}
+function carvInner(){const c=S.clim;return `${carSVG()}<span class="cap">${c.auto?t('auto'):t(c.mode)} · ${t('fan')} ${c.auto?'A':N(c.fan)}${c.recirc?' · '+t('recirc'):''}</span>`}
+/* iOS-style temperature wheel */
+const WV=[];for(let v=16;v<=28;v+=.5)WV.push(v);const IH=64;
+function wheelStyle(w){const mid=w.scrollTop+w.clientHeight/2;w.querySelectorAll('.wi').forEach(it=>{const d=((it.offsetTop+IH/2)-mid)/IH,a=Math.min(Math.abs(d),3.5);
+  it.style.transform=`rotateX(${(-d*17).toFixed(1)}deg) scale(${(1-a*.08).toFixed(3)})`;it.style.opacity=Math.max(.06,1-a*.34).toFixed(2);it.classList.toggle('sel',Math.abs(d)<.5)})}
+function wheelTo(w,v){w._prog=true;w.scrollTop=WV.indexOf(v)*IH;w._last=WV.indexOf(v);wheelStyle(w);setTimeout(()=>{w._prog=false},60)}
+function initWheels(root){root.querySelectorAll('.wheel').forEach(w=>{const h=w.clientHeight;w.querySelectorAll('.sp').forEach(sp=>sp.style.height=Math.max(0,(h-IH)/2)+'px');
+  wheelTo(w,w.dataset.v==='d'?S.clim.dT:S.clim.pT);
+  w.addEventListener('scroll',()=>{wheelStyle(w);const i=Math.round(w.scrollTop/IH);if(i!==w._last){w._last=i;if(!w._prog)tick()}
+    clearTimeout(w._t);w._t=setTimeout(()=>wheelCommit(w),130)},{passive:true})})}
+function wheelCommit(w){if(w._prog||!w.isConnected)return;const v=WV[Math.max(0,Math.min(WV.length-1,Math.round(w.scrollTop/IH)))],c=S.clim;
+  if(w.dataset.v==='d'){if(v===c.dT)return;c.dT=v;if(c.sync){c.pT=v;const o=document.querySelector('.wheel[data-v="p"]');if(o)wheelTo(o,v)}}
+  else{if(v===c.pT)return;c.pT=v;c.sync=false}
+  document.querySelectorAll('.wheel').forEach(x=>{const val=x.dataset.v==='d'?c.dT:c.pT;x.style.setProperty('--wc',tempCol(val));x.setAttribute('aria-valuenow',val)});
+  renderBar();const cv=document.querySelector('.carv');if(cv)cv.innerHTML=SEP(carvInner());
+  const sy=document.querySelector('[data-a=tog][data-v=sync]');if(sy)sy.classList.toggle('on',c.sync);checkTask()}
 function climate(){
   const c=S.clim;
-  const zone=s=>{const v=s==='d'?c.dT:c.pT, L=s==='d'?'L':'R';
+  const zone=s=>{const v=s==='d'?c.dT:c.pT, L=s==='d'?'L':'R', who=t(s==='d'?'driver':'passenger');
     const lv=n=>`<span class="lv">${[1,2,3].map(i=>`<i class="${n>=i?'a':''}"></i>`).join('')}</span>`;
-    return `<div class="zone"><div class="tbig"><span class="z">${t(s==='d'?'driver':'passenger')}</span>
-      <button ${A('temp',s+'+')} aria-label="+">${I('up')}</button>
-      <span class="v num" style="color:${tempCol(v)}">${tempFmt(v)}°</span>
-      <button ${A('temp',s+'-')} aria-label="−">${I('down')}</button></div>
-      <div class="seats"><button class="tile warm ${c['seat'+L]?'on':''}" ${A('seat','seat'+L)}>${I('seat')}${lv(c['seat'+L])}<span>${t('seatHeat')}</span></button>
-      <button class="tile ${c['vent'+L]?'on':''}" ${A('seat','vent'+L)}>${I('seat')}${lv(c['vent'+L])}<span>${t('seatVent')}</span></button></div></div>`};
-  const tg=(k,ic,lbl,cls='')=>`<button class="tile ${cls} ${c[k]?'on':''}" ${A('tog',k)}>${ic}<span>${lbl}</span></button>`;
-  const md=(k,ic)=>`<button class="tile ${c.mode===k?'on':''}" ${A('mode',k)}>${I(ic)}<span>${t(k)}</span></button>`;
+    return `<div class="zone"><div class="tbig"><span class="z">${who}</span>
+      <div class="wwrap"><div class="wheel" data-a="wheel" data-v="${s}" role="slider" aria-label="${who}" aria-valuemin="16" aria-valuemax="28" aria-valuenow="${v}" style="--wc:${tempCol(v)}">
+      <div class="sp"></div>${WV.map((x,i)=>`<div class="wi num" data-i="${i}">${tempFmt(x)}°</div>`).join('')}<div class="sp"></div></div></div></div>
+      <div class="seats"><button class="tile io warm ${c['seat'+L]?'on':''}" ${A('seat','seat'+L)} aria-label="${t('seatHeat')} · ${who}">${I('seatH')}${lv(c['seat'+L])}</button>
+      <button class="tile io ${c['vent'+L]?'on':''}" ${A('seat','vent'+L)} aria-label="${t('seatVent')} · ${who}">${I('seatV')}${lv(c['vent'+L])}</button></div></div>`};
+  const tg=(k,ic,lbl,cls='',io=false)=>`<button class="tile ${io?'io':''} ${cls} ${c[k]?'on':''}" ${A('tog',k)} aria-label="${lbl}">${ic}${io?'':`<span>${lbl}</span>`}</button>`;
+  const md=(k,ic)=>`<button class="tile io ${c.mode===k&&!c.auto?'on':''}" ${A('mode',k)} aria-label="${t('airflow')} · ${t(k)}">${I(ic)}</button>`;
   const segs=[1,2,3,4,5,6,7].map(i=>`<button class="${!c.auto&&c.fan>=i?'a':''}" style="--hh:${30+i*10}%" ${A('fan',i)} aria-label="${t('fan')} ${i}"></button>`).join('');
-  return `<div class="scr"><div class="clim" dir="ltr">${zone('d')}
+  return `<div class="scr${enterCls}"><div class="clim" dir="ltr">${zone('d')}
    <div class="cen" dir="${S.lang==='fa'?'rtl':'ltr'}">
+    <div class="carv">${carvInner()}</div>
     <div class="r4">${tg('auto','<b style="font-size:18px">AUTO</b>',t('auto'))}${tg('ac',I('snow'),t('ac'))}${tg('recirc',I('recirc'),t('recirc'))}${tg('sync',I('link'),t('sync'))}</div>
     <div><div class="fanlbl"><span class="h">${t('fan')}</span><span class="num">${c.auto?t('auto'):N(c.fan)} / ${N(7)}</span></div>
      <div class="fanrow" dir="ltr"><button ${A('fan','-')} aria-label="−">${I('minus')}</button><div class="segs">${segs}</div><button ${A('fan','+')} aria-label="+">${I('plus')}</button></div></div>
     <div><div class="fanlbl"><span class="h">${t('airflow')}</span></div><div class="r4">${md('face','fFace')}${md('both','fBoth')}${md('feet','fFeet')}${md('wind','fWind')}</div></div>
-    <div class="r3">${tg('fDef',I('defF'),t('fDef'),'warm')}${tg('rDef',I('defR'),t('rDef'),'warm')}${tg('wheel',I('wheel'),t('wheel'),'warm')}</div>
+    <div class="r3">${tg('fDef',I('defF'),t('fDef'),'warm',true)}${tg('rDef',I('defR'),t('rDef'),'warm',true)}${tg('wheel',I('wheel'),t('wheel'),'warm',true)}</div>
    </div>${zone('p')}</div></div>`;
 }
 
+function srcSheet(){const m=S.media;return `<div class="sheet-bg" ${A('closesheet')}><div class="sheet"><div class="h" style="padding:8px 12px">${t('chooseSrc')}</div>
+    ${[['bt','bt',S.lang==='fa'?'آیفون امیر':"Amir's iPhone"],['fm','radio',nm(FMS[m.fm])],['usb','usb','Road Tapes']].map(([k,ic,sub])=>`<button class="row ${m.src===k?'on':''}" ${A('setsrc',k)}>${I(ic)}<div class="gr"><div class="t1">${t(k)}</div><div class="t2">${esc(sub)}</div></div>${m.src===k?I('check'):''}</button>`).join('')}</div></div>`}
 function media(){
   const m=S.media; let left, right;
   const srcIc={bt:'bt',fm:'radio',usb:'usb'}[m.src];
@@ -545,9 +801,9 @@ function media(){
       <div class="bigctl" dir="ltr"><button ${A('mprev')} aria-label="previous">${I('prev')}</button><button class="pp" ${A('mplay')} aria-label="play pause">${I(m.playing?'pause':'play')}</button><button ${A('mnext')} aria-label="next">${I('next')}</button></div></div>`;
     right=`<div class="card list"><div class="h">${t('library')}</div><div class="scroll" data-scroll="lib">${list.map((s,i)=>`<button class="row ${i===idx?'on':''}" ${A('mtrack',i)}><div class="art" style="${artBg(s.h)}"></div><div class="gr"><div class="t1">${esc(s.t)}</div><div class="t2">${esc(s.a)}</div></div><span class="t2 num">${mmss(s.d)}</span></button>`).join('')}</div></div>`;
   }
-  const sheet=S.sheet==='src'?`<div class="sheet-bg" ${A('closesheet')}><div class="sheet"><div class="h" style="padding:8px 12px">${t('chooseSrc')}</div>
-    ${[['bt','bt',S.lang==='fa'?'آیفون امیر':"Amir's iPhone"],['fm','radio',nm(FMS[m.fm])],['usb','usb','Road Tapes']].map(([k,ic,sub])=>`<button class="row ${m.src===k?'on':''}" ${A('setsrc',k)}>${I(ic)}<div class="gr"><div class="t1">${t(k)}</div><div class="t2">${esc(sub)}</div></div>${m.src===k?I('check'):''}</button>`).join('')}</div></div>`:'';
-  return `<div class="scr"><div class="med">${left}${right}</div></div>${sheet}`;
+  const sheet=S.sheet==='src'?srcSheet():'';
+  const hue=m.src==='fm'?200:cur().h;
+  return `<div class="scr${enterCls}" style="background:radial-gradient(90% 80% at 15% 0%,hsl(${hue} 55% 24% / .55),transparent 65%)"><div class="med">${left}${right}</div></div>${sheet}`;
 }
 
 function phone(){
@@ -564,7 +820,7 @@ function phone(){
       <div style="display:flex;gap:10px"><button class="btn pri" style="min-width:180px" ${A('pdial')}>${I('phone')}<span>${t('call')}</span></button><button class="btn" ${A('pdel')} aria-label="delete">${I('bksp')}</button></div></div>
       <div class="keys" dir="ltr">${['1','2','3','4','5','6','7','8','9','*','0','#'].map(k=>`<button class="key" ${A('pkey',k)}>${N(k)}</button>`).join('')}</div></div>`;
   }
-  return `<div class="scr"><div class="ph"><div class="tabs">${tab('recents')}${tab('contacts')}${tab('keypad')}</div>${body}</div></div>`;
+  return `<div class="scr${enterCls}"><div class="ph"><div class="tabs">${tab('recents')}${tab('contacts')}${tab('keypad')}</div>${body}</div></div>`;
 }
 function callStatus(){const c=S.phone.call;const e=(Date.now()-c.t0)/1000;return e<2.5?t('calling'):mmss(e-2.5)}
 function callScreen(){const c=S.phone.call;const con=CB[c.cid];
@@ -572,9 +828,24 @@ function callScreen(){const c=S.phone.call;const con=CB[c.cid];
   <div class="cbtns"><button class="tile ${c.mute?'on':''}" ${A('pmute')}>${I('micoff')}<span>${t('mute')}</span></button><button class="tile ${c.spk?'on':''}" ${A('pspk')}>${I('vol')}<span>${t('speaker')}</span></button>
   <button class="tile end" ${A('pend')}>${I('phone')}<span>${t('end')}</span></button><button class="tile" ${A('go','home')}>${I('home')}<span>${t('home')}</span></button></div></div>`}
 
-function route(id){const p=PB[id||S.nav.dest||S.nav.sel];const d=Math.abs(p.x)+Math.abs(p.y);const min=Math.max(1,Math.round(d/450));
-  const at=new Date(Date.now()+min*60000);return{km:(d/1000).toFixed(1),min,arr:at.getHours()+':'+String(at.getMinutes()).padStart(2,'0'),first:Math.abs(p.x),turn:p.y<0?'L':'R'}}
-function distStr(m){return m>=1000?N((m/1000).toFixed(1))+' '+t('km'):N(Math.round(m/50)*50)+' '+t('m')}
+function geom(p){const sx=Math.round(p.x/400)*400;let pts=[[0,0],[sx,0],[sx,p.y],[p.x,p.y]];
+  pts=pts.filter((q,i)=>i===0||q[0]!==pts[i-1][0]||q[1]!==pts[i-1][1]);
+  const cum=[0];for(let i=1;i<pts.length;i++)cum.push(cum[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));
+  return{pts,cum,L:cum[cum.length-1]}}
+function posAt(G,d){d=Math.max(0,Math.min(G.L,d));let i=1;while(i<G.cum.length-1&&G.cum[i]<d)i++;
+  const a=G.pts[i-1],b=G.pts[i],seg=(G.cum[i]-G.cum[i-1])||1,k=(d-G.cum[i-1])/seg;
+  return{x:a[0]+(b[0]-a[0])*k,y:a[1]+(b[1]-a[1])*k,h:Math.atan2(b[1]-a[1],b[0]-a[0]),i}}
+function turnAt(G,i){if(i>=G.pts.length-1)return'F';const a=G.pts[i-1],b=G.pts[i],c=G.pts[i+1];
+  return((b[0]-a[0])*(c[1]-b[1])-(b[1]-a[1])*(c[0]-b[0]))>0?'R':'L'}
+function route(id){const act=!id&&S.nav.mode==='route';const p=PB[id||S.nav.dest||S.nav.sel];const G=geom(p);
+  const prog=act?S.nav.prog:0, rem=Math.max(0,G.L-prog), q=posAt(G,prog);
+  const min=rem<60?0:Math.max(1,Math.round(rem/450)); const at=new Date(Date.now()+Math.max(min,1)*60000);
+  const first=q.i<G.pts.length-1?G.cum[q.i]-prog:rem;
+  return{km:(rem/1000).toFixed(1),min,arr:at.getHours()+':'+String(at.getMinutes()).padStart(2,'0'),first,turn:turnAt(G,q.i),leg:q.i,G}}
+function distStr(m){return m>=1000?N((m/1000).toFixed(1))+' '+t('km'):N(Math.max(0,Math.round(m/50)*50))+' '+t('m')}
+function manText(r){const d=distStr(r.first);
+  if(r.turn==='F')return S.lang==='fa'?[`${d} تا مقصد`,nm(PB[S.nav.dest])]:[`${d}`,`to ${nm(PB[S.nav.dest])}`];
+  return S.lang==='fa'?[`پس از ${d}`,r.turn==='R'?'به راست بپیچید':'به چپ بپیچید']:[`In ${d}`,r.turn==='R'?'turn right':'turn left']}
 function nav(){
   const n=S.nav; let o='';
   if(n.mode==='idle') o=`<button class="pill" ${A('nsearch')}>${I('search')}<span>${t('whereTo')}</span></button>`;
@@ -596,79 +867,133 @@ function nav(){
     o=`<div class="navcard"><div><div class="t1">${esc(nm(p))}</div><div class="t2">${esc(nm(p.c))}</div></div>
      <div class="stats"><div><b class="num">${N(r.min)}</b><span>${t('min')}</span></div><div><b class="num">${N(r.km)}</b><span>${t('km')}</span></div><div><b class="num">${N(r.arr)}</b><span>${t('arrive')}</span></div></div>
      <div class="acts"><button class="btn pri" ${A('nstart')}>${I('nav')}<span>${t('start')}</span></button><button class="btn" ${A('ncancel')}>${t('cancel')}</button></div></div>`}
-  if(n.mode==='route'){const p=PB[n.dest],r=route();
-    const txt=S.lang==='fa'?`پس از ${distStr(r.first)}`:`In ${distStr(r.first)}`;const tt=S.lang==='fa'?(r.turn==='R'?'به راست بپیچید':'به چپ بپیچید'):(r.turn==='R'?'turn right':'turn left');
-    o=`<div class="man">${I(r.turn==='R'?'turnR':'turnL')}<div><b class="num">${txt}</b><span>${tt}</span></div></div>
-     <div class="navcard"><div class="t1">${esc(nm(p))}</div><div class="stats"><div><b class="num">${N(r.arr)}</b><span>${t('arrive')}</span></div><div><b class="num">${N(r.min)}</b><span>${t('min')}</span></div><div><b class="num">${N(r.km)}</b><span>${t('km')}</span></div></div>
+  if(n.mode==='route'){const p=PB[n.dest],r=route(),mt=manText(r);
+    o=`<div class="navfade"></div><div class="man">${I(r.turn==='R'?'turnR':r.turn==='L'?'turnL':'pin')}<div><b class="num" id="manD">${mt[0]}</b><span id="manT">${esc(mt[1])}</span></div></div>
+     <div class="navcard"><div class="t1">${esc(nm(p))}</div><div class="stats"><div><b class="num" id="nArr">${N(r.arr)}</b><span>${t('arrive')}</span></div><div><b class="num" id="nMin">${N(r.min)}</b><span>${t('min')}</span></div><div><b class="num" id="nKm">${N(r.km)}</b><span>${t('km')}</span></div></div>
      <div class="acts"><button class="btn dng" ${A('nend')}>${I('x')}<span>${t('endRoute')}</span></button></div></div>`}
+  if(n.mode==='arrived'){const p=PB[n.dest];
+    o=`<div class="navcard"><div class="t2">${t('arrived')}</div><div class="t1">${esc(nm(p))}</div><div class="acts"><button class="btn pri" ${A('nend')}>${I('check')}<span>${t('done')}</span></button></div></div>`}
   const zm=n.mode==='search'?'':`<div class="zoom"><button ${A('nzoom','+')} aria-label="zoom in">${I('plus')}</button><button ${A('nzoom','-')} aria-label="zoom out">${I('minus')}</button></div>`;
-  return `<div class="nav"><canvas data-map="full"></canvas>${o}${zm}</div>`;
+  return `<div class="nav${enterCls}"><canvas data-map="full" class="${n.mode==='route'?'tilt':''}"></canvas>${o}${zm}</div>`;
 }
+function updNavUI(r){const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v};
+  const mt=manText(r);set('manD',mt[0]);set('manT',mt[1]);set('nMin',N(r.min));set('nKm',N(r.km));set('nArr',N(r.arr));
+  const np=document.getElementById('npMin');if(np)np.textContent=N(r.min)}
 
 function settings(){
-  return `<div class="scr" style="overflow-y:auto"><div class="set">
+  return `<div class="scr${enterCls}" style="overflow-y:auto"><div class="set">
    <div class="card srow"><span class="lbl">${t('display')}</span><div class="bri" dir="ltr"><button ${A('bright','-')} aria-label="−">${I('minus')}</button><div class="bar2"><i style="width:${PREF.bright}%"></i></div><button ${A('bright','+')} aria-label="+">${I('plus')}</button></div></div>
    <div class="card srow"><span class="lbl">${t('language')}</span><div class="seg"><button class="${S.lang==='fa'?'on':''}" ${A('lang','fa')}>فارسی</button><button class="${S.lang==='en'?'on':''}" ${A('lang','en')}>English</button></div></div>
    <div class="card srow"><span class="lbl">${t('tsound')}</span><div class="seg"><button class="${PREF.click?'on':''}" ${A('click','1')}>${t('on')}</button><button class="${!PREF.click?'on':''}" ${A('click','0')}>${t('off')}</button></div></div>
    <div class="srow" style="color:var(--tx3)"><span>${t('about')}</span></div></div></div>`;
 }
 
-/* ---------- map ---------- */
+/* ---------- map (procedural city; grid space rotated for an organic look) ---------- */
 function rng(seed){return()=>{seed=(seed*16807)%2147483647;return(seed-1)/2147483646}}
-const PARKS=(()=>{const r=rng(7),a=[];for(let i=0;i<60;i++)a.push([ (r()-.5)*40000,(r()-.5)*40000,300+r()*1400,300+r()*1100]);return a})();
+const hsh=(x,y)=>{let h=(x*374761393+y*668265263)|0;h=(h^(h>>>13))*1274126177|0;return((h^(h>>>16))>>>0)/4294967295};
+const ROT=-0.2;
+const PARKS=(()=>{const r=rng(7),a=[];for(let i=0;i<70;i++)a.push([(r()-.5)*44000,(r()-.5)*44000,300+r()*1300,300+r()*1000]);return a})();
+const samp=(f,a,b,st=250)=>{const o=[];for(let v=a;v<=b;v+=st)o.push(f(v));return o};
+const HWY=[samp(x=>[x,-5200+1400*Math.sin(x/7000)],-40000,40000),samp(y=>[2600+1200*Math.sin(y/6000),y],-40000,40000),
+  samp(y=>[-5400+700*Math.sin(y/4000),y],-40000,40000),samp(x=>[x,4200+900*Math.sin(x/8000+1)],-40000,40000),
+  samp(x=>[x,-12000+2200*Math.sin(x/9000+2)],-40000,40000)];
+const VALLEY=samp(y=>[-2600+1800*Math.sin(y/5000),y],-40000,40000);
+const DIST=[{fa:'ونک',en:'VANAK',x:400,y:-2300},{fa:'یوسف‌آباد',en:'YOUSEFABAD',x:-1500,y:1100},{fa:'سعادت‌آباد',en:'SAADAT ABAD',x:-5600,y:-3400},
+ {fa:'تجریش',en:'TAJRISH',x:1600,y:-7600},{fa:'نارمک',en:'NARMAK',x:9000,y:2600},{fa:'پونک',en:'PUNAK',x:-9200,y:-3000},
+ {fa:'امیرآباد',en:'AMIRABAD',x:-700,y:3500},{fa:'زعفرانیه',en:'ZAFARANIYEH',x:-2000,y:-6300},{fa:'پاسداران',en:'PASDARAN',x:5400,y:-3100},
+ {fa:'شهرک غرب',en:'SHAHRAK-E GHARB',x:-8000,y:-1000},{fa:'جنت‌آباد',en:'JANNAT ABAD',x:-12500,y:-5000},{fa:'تهرانپارس',en:'TEHRANPARS',x:13500,y:-600}];
 function drawMap(cv){
-  const R=cv.getBoundingClientRect(); if(!R.width) return; const dpr=window.devicePixelRatio||1;
-  cv.width=R.width*dpr; cv.height=R.height*dpr; const g=cv.getContext('2d'); g.scale(dpr,dpr); const W=R.width,H=R.height;
-  const mini=cv.dataset.map==='mini', n=S.nav;
-  const tid=n.mode==='route'?n.dest:n.mode==='preview'?n.sel:null, tg=tid?PB[tid]:null;
-  let sc=0.06*n.zoom*(mini?.8:1), cx=0, cy=0, offX=0;
-  if(tg){const pad=mini?40:140;sc=Math.min((W-pad*2)/Math.max(Math.abs(tg.x),300),(H-pad*2)/Math.max(Math.abs(tg.y),300),.14)*n.zoom;cx=tg.x/2;cy=tg.y/2;
-    if(!mini&&n.mode!=='idle'){offX=Math.min(240,W*.18)*(S.lang==='fa'?-1:1)}}
-  if(n.mode==='search'&&!mini){offX=Math.min(330,W*.25)*(S.lang==='fa'?-1:1)}
-  const P=(x,y)=>[W/2+offX+(x-cx)*sc,H/2+(y-cy)*sc];
-  g.fillStyle='#0E1317';g.fillRect(0,0,W,H);
-  g.fillStyle='#122019';PARKS.forEach(([x,y,w,h])=>{const[a,b]=P(x,y);g.fillRect(a,b,w*sc,h*sc)});
-  let sp=400;while(sp*sc<16)sp*=5;
-  const x0=cx-(W/2+Math.abs(offX))/sc, x1=cx+(W/2+Math.abs(offX))/sc, y0=cy-H/2/sc, y1=cy+H/2/sc;
-  const grid=(step,col,w)=>{g.strokeStyle=col;g.lineWidth=w;g.beginPath();
-    for(let x=Math.floor(x0/step)*step;x<=x1;x+=step){const[a]=P(x,0);g.moveTo(a,0);g.lineTo(a,H)}
-    for(let y=Math.floor(y0/step)*step;y<=y1;y+=step){const[,b]=P(0,y);g.moveTo(0,b);g.lineTo(W,b)}g.stroke()};
-  grid(sp,'#18222A',1);grid(sp*5,'#223039',3);
-  g.strokeStyle='#2E3E4A';g.lineWidth=6;g.lineCap='round';
-  [[[-30000,-9000],[30000,7000]],[[-7000,-30000],[-2500,30000]],[[-30000,12000],[30000,2000]]].forEach(([a,b])=>{g.beginPath();g.moveTo(...P(...a));g.lineTo(...P(...b));g.stroke()});
-  if(tg){const pts=[[0,0],[tg.x,0],[tg.x,tg.y]].map(p=>P(...p));
-    g.lineJoin='round';g.strokeStyle='rgba(92,195,230,.25)';g.lineWidth=14;g.beginPath();g.moveTo(...pts[0]);pts.slice(1).forEach(p=>g.lineTo(...p));g.stroke();
-    g.strokeStyle='#5CC3E6';g.lineWidth=6;g.stroke();
-    const[dx,dy]=pts[2];g.fillStyle='#F0605A';g.beginPath();g.arc(dx,dy,11,0,7);g.fill();g.fillStyle='#0E1317';g.beginPath();g.arc(dx,dy,4,0,7);g.fill()}
-  const[cxp,cyp]=P(0,0);g.save();g.translate(cxp,cyp);
-  g.fillStyle='rgba(92,195,230,.18)';g.beginPath();g.arc(0,0,26,0,7);g.fill();
-  g.fillStyle='#fff';g.beginPath();g.moveTo(0,-14);g.lineTo(10,11);g.lineTo(0,6);g.lineTo(-10,11);g.closePath();g.fill();g.restore();
+  const R=cv.getBoundingClientRect(); if(!R.width)return; const dpr=Math.min(2,window.devicePixelRatio||1);
+  const cw=Math.round(R.width*dpr),ch=Math.round(R.height*dpr); if(cv.width!==cw||cv.height!==ch){cv.width=cw;cv.height=ch}
+  const g=cv.getContext('2d'); g.setTransform(dpr,0,0,dpr,0,0); const W=R.width,H=R.height;
+  const mini=cv.dataset.map==='mini', n=S.nav, rtl=S.lang==='fa';
+  const tid=(n.mode==='route'||n.mode==='arrived')?n.dest:n.mode==='preview'?n.sel:null, tg=tid?PB[tid]:null, G=tg?geom(tg):null;
+  let sc=0.06*n.zoom*(mini?.8:1), cx=0, cy=0, ax=W/2, ay=H/2, rot=ROT;
+  let car={x:0,y:0,h:-Math.PI/2};
+  if(G&&(n.mode==='route'||n.mode==='arrived')){const q=posAt(G,n.prog);car={x:q.x,y:q.y,h:q.h};cx=q.x;cy=q.y;rot=n.rot;sc=0.11*n.zoom;ay=H*(mini?.62:.78);if(mini)sc=0.08*n.zoom}
+  else if(G){const xs=G.pts.map(p=>p[0]),ys=G.pts.map(p=>p[1]);const bw=Math.max(...xs)-Math.min(...xs),bh=Math.max(...ys)-Math.min(...ys);
+    cx=(Math.max(...xs)+Math.min(...xs))/2;cy=(Math.max(...ys)+Math.min(...ys))/2;const pad=mini?30:110;
+    sc=Math.min((W-pad*2)/(Math.max(bw,bh,600)*1.15),(H-pad*2)/(Math.max(bw,bh,600)*1.15),.16)*n.zoom;if(!mini)ax=W/2+W*.16*(rtl?-1:1)}
+  if(n.mode==='search'&&!mini)ax=W/2+W*.25*(rtl?-1:1);
+  g.fillStyle='#0D1216';g.fillRect(0,0,W,H);
+  g.save();g.translate(ax,ay);g.rotate(rot);g.scale(sc,sc);g.translate(-cx,-cy);
+  const px=v=>v/sc, Rv=Math.hypot(W,H)/sc*(n.mode==='route'&&!mini?1.3:.75);
+  const x0=cx-Rv,x1=cx+Rv,y0=cy-Rv,y1=cy+Rv;
+  g.lineCap='round';g.lineJoin='round';
+  // valley + parks
+  g.strokeStyle='#10231B';g.lineWidth=520;g.beginPath();VALLEY.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.stroke();
+  g.fillStyle='#10211A';PARKS.forEach(([x,y,w,h])=>{if(x+w<x0||x>x1||y+h<y0||y>y1)return;g.beginPath();g.roundRect?g.roundRect(x,y,w,h,120):g.rect(x,y,w,h);g.fill()});
+  // buildings when zoomed in
+  if(sc*400>34){g.fillStyle='#151D24';const b0x=Math.floor(x0/400),b1x=Math.ceil(x1/400),b0y=Math.floor(y0/400),b1y=Math.ceil(y1/400);
+    for(let bx=b0x;bx<=b1x;bx++)for(let by=b0y;by<=b1y;by++){const k=hsh(bx,by);if(k<.12)continue;const ox=bx*400,oy=by*400,cnt=2+Math.floor(k*3);
+      for(let j=0;j<cnt;j++){const r1=hsh(bx*7+j,by*13-j),r2=hsh(bx*3-j,by*5+j*7);const w=90+r1*150,h=70+r2*140;g.fillRect(ox+30+r2*(340-w-30),oy+30+r1*(340-h-30),w,h)}}}
+  // street grid
+  const grid=(step,col,w)=>{g.strokeStyle=col;g.lineWidth=px(w);g.beginPath();
+    for(let x=Math.floor(x0/step)*step;x<=x1;x+=step){g.moveTo(x,y0);g.lineTo(x,y1)}
+    for(let y=Math.floor(y0/step)*step;y<=y1;y+=step){g.moveTo(x0,y);g.lineTo(x1,y)}g.stroke()};
+  if(sc*400>10)grid(400,'#1B252D',Math.max(1,Math.min(7,sc*12)));
+  grid(2000,'#27333D',Math.max(2,Math.min(12,sc*26)));
+  // expressways with casing
+  const hw=Math.max(3.5,Math.min(16,sc*44));
+  [['#0D1216',hw+3],['#3A4F60',hw]].forEach(([c,w])=>{g.strokeStyle=c;g.lineWidth=px(w);HWY.forEach(l=>{g.beginPath();l.forEach((p,i)=>i?g.lineTo(...p):g.moveTo(...p));g.stroke()})});
+  // route
+  if(G){const done=n.mode==='route'||n.mode==='arrived'?n.prog:0;const q=posAt(G,done);
+    const path=(from)=>{g.beginPath();g.moveTo(from.x,from.y);for(let i=from.i;i<G.pts.length;i++)g.lineTo(...G.pts[i])};
+    const AC=(MODES[S.mode]||MODES.urban).acc;g.globalAlpha=.25;g.strokeStyle=AC;g.lineWidth=px(18);path(q);g.stroke();g.globalAlpha=1;
+    g.strokeStyle=AC;g.lineWidth=px(8);path(q);g.stroke();
+    if(done>0){g.strokeStyle='#3A4D5C';g.lineWidth=px(6);g.beginPath();g.moveTo(...G.pts[0]);for(let i=1;i<q.i;i++)g.lineTo(...G.pts[i]);g.lineTo(q.x,q.y);g.stroke()}
+    const d=G.pts[G.pts.length-1];g.save();g.translate(d[0],d[1]);g.rotate(-rot);g.scale(1/sc,1/sc);
+    g.fillStyle='#F0605A';g.beginPath();g.arc(0,-14,11,Math.PI*.85,Math.PI*.15);g.lineTo(0,2);g.closePath();g.fill();g.fillStyle='#0D1216';g.beginPath();g.arc(0,-14,4,0,7);g.fill();g.restore()}
+  // district labels
+  g.fillStyle='#46596A';g.textAlign='center';g.textBaseline='middle';
+  const fs=mini?11:13;g.font=`600 ${fs}px ${rtl?'Vazirmatn':'Barlow'},system-ui,sans-serif`;
+  if(sc<0.25)DIST.forEach(d=>{if(d.x<x0||d.x>x1||d.y<y0||d.y>y1)return;g.save();g.translate(d.x,d.y);g.rotate(-rot);g.scale(1/sc,1/sc);
+    if(!rtl&&g.letterSpacing!==undefined)g.letterSpacing='2px';g.fillText(rtl?d.fa:d.en,0,0);g.restore()});
+  // car
+  g.save();g.translate(car.x,car.y);g.rotate(car.h+Math.PI/2);g.scale(1/sc,1/sc);
+  g.globalAlpha=.22;g.fillStyle=(MODES[S.mode]||MODES.urban).acc;g.beginPath();g.arc(0,0,26,0,7);g.fill();g.globalAlpha=1;
+  g.fillStyle='#fff';g.strokeStyle='#0D1216';g.lineWidth=2;g.beginPath();g.moveTo(0,-15);g.lineTo(11,12);g.lineTo(0,6);g.lineTo(-11,12);g.closePath();g.fill();g.stroke();g.restore();
+  g.restore();
 }
+/* simulated driving + smooth heading-up rotation */
+let lastT=0,lastUI=0;
+function frame(ts){const dt=lastT?Math.min(.1,(ts-lastT)/1000):0;lastT=ts;const n=S.nav;
+  if(n.mode==='route'){const G=geom(PB[n.dest]);if(!n.freeze)n.prog+=14*dt;
+    const q=posAt(G,n.prog);let tr=-Math.PI/2-q.h,d=tr-n.rot;d=Math.atan2(Math.sin(d),Math.cos(d));n.rot+=d*Math.min(1,dt*3);
+    if(n.prog>=G.L){n.prog=G.L;n.mode='arrived';render()}
+    else{document.querySelectorAll('canvas[data-map]').forEach(drawMap);
+      if(ts-lastUI>400){lastUI=ts;const r=route();if(r.leg!==n.leg){n.leg=r.leg;render()}else updNavUI(r)}}}
+  requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
 
 /* ---------- actions ---------- */
 const clampT=v=>Math.max(16,Math.min(28,v));
 const ACT={
  go(v){S.screen=v;S.sheet=null},
+ modesheet(){if(trial&&trial.running){toast('lock',t('locked'));return}S.sheet=S.sheet==='mode'?null:'mode'},
+ setmode(v){if(trial&&trial.running)return;S.mode=PREF.mode=v;savePref();S.sheet=null;toast(MODES[v].icon,`${t('driveMode')} · ${nm(MODES[v])}`)},
  temp(v){const s=v[0],d=v[1]==='+'?.5:-.5;const c=S.clim;
    if(s==='d'){c.dT=clampT(c.dT+d);if(c.sync)c.pT=c.dT}else{c.pT=clampT(c.pT+d);c.sync=false}},
- fan(v){const c=S.clim;c.auto=false;if(v==='+')c.fan=Math.min(7,c.fan+1);else if(v==='-')c.fan=Math.max(1,c.fan-1);else c.fan=+v},
- mode(v){S.clim.mode=v;S.clim.auto=false;if(S.clim.fDef&&v!=='wind')S.clim.fDef=false},
+ fan(v){const c=S.clim;c.auto=false;if(v==='+')c.fan=Math.min(7,c.fan+1);else if(v==='-')c.fan=Math.max(1,c.fan-1);else c.fan=+v;if(S.screen!=='climate')toast('fan',`${t('fan')} · ${N(c.fan)}`)},
+ mode(v){S.clim.mode=v;S.clim.auto=false;if(S.clim.fDef&&v!=='wind')S.clim.fDef=false;toast({face:'fFace',feet:'fFeet',both:'fBoth',wind:'fWind'}[v],`${t('airflow')} · ${t(v)}`)},
  tog(k){const c=S.clim;c[k]=!c[k];
    if(k==='sync'&&c.sync)c.pT=c.dT;
-   if(k==='fDef'){if(c.fDef){c.prevMode=c.mode;c.mode='wind';c.ac=true;c.fan=Math.max(c.fan,6);c.auto=false}else c.mode=c.prevMode}},
+   if(k==='fDef'){if(c.fDef){c.prevMode=c.mode;c.mode='wind';c.ac=true;c.fan=Math.max(c.fan,6);c.auto=false}else c.mode=c.prevMode}
+   toast({auto:'fan',ac:'snow',recirc:'recirc',sync:'link',fDef:'defF',rDef:'defR',wheel:'wheel'}[k],`${t(k)} · ${c[k]?t('on'):t('off')}`)},
  seat(k){const c=S.clim;c[k]=[3,0,1,2][c[k]]??0;const side=k.slice(-1);
-   if(c[k]){if(k.startsWith('seat'))c['vent'+side]=0;else c['seat'+side]=0}},
+   if(c[k]){if(k.startsWith('seat'))c['vent'+side]=0;else c['seat'+side]=0}
+   toast(k.startsWith('seat')?'seatH':'seatV',`${t(k.startsWith('seat')?'seatHeat':'seatVent')} · ${t(side==='L'?'driver':'passenger')} · ${c[k]?t('level')+' '+N(c[k]):t('off')}`)},
  mplay(){S.media.playing=!S.media.playing},
- mnext(){const m=S.media;if(m.src==='fm')return ACT.fmseek('+');if(m.src==='usb'){m.usb=(m.usb+1)%USB.length;m.upos=0}else{m.track=(m.track+1)%TRACKS.length;m.pos=0}m.playing=true},
+ mnext(){const m=S.media;if(m.src==='fm')return ACT.fmseek('+');if(m.src==='usb'){m.usb=(m.usb+1)%USB.length;m.upos=0}else{m.track=(m.track+1)%TRACKS.length;m.pos=0}m.playing=true;if(S.screen!=='media')toast('next',cur().t)},
  mprev(){const m=S.media;if(m.src==='fm')return ACT.fmseek('-');
    if(m.src==='usb'){if(m.upos>3)m.upos=0;else{m.usb=(m.usb+USB.length-1)%USB.length;m.upos=0}}
    else{if(m.pos>3)m.pos=0;else{m.track=(m.track+TRACKS.length-1)%TRACKS.length;m.pos=0}}m.playing=true},
  mtrack(v){const m=S.media;if(m.src==='usb'){m.usb=+v;m.upos=0}else{m.track=+v;m.pos=0}m.playing=true},
  msrc(){S.sheet='src'},closesheet(){S.sheet=null},
- setsrc(v){S.media.src=v;S.media.playing=true;S.sheet=null},
+ setsrc(v){S.media.src=v;S.media.playing=true;S.sheet=null;toast({bt:'bt',fm:'radio',usb:'usb'}[v],`${t('source')} · ${t(v)}`)},
  fmpre(v){S.media.fm=+v;S.media.freq=FMS[v].f;S.media.playing=true},
  fmtune(v){const m=S.media;m.freq=Math.round((Math.max(87.5,Math.min(108,m.freq+(v==='+'?.1:-.1))))*10)/10;const i=FMS.findIndex(s=>Math.abs(s.f-m.freq)<.05);if(i>=0)m.fm=i},
- fmseek(v){const m=S.media;const up=v==='+';const c=up?FMS.find(s=>s.f>m.freq+.05)||FMS[0]:[...FMS].reverse().find(s=>s.f<m.freq-.05)||FMS[FMS.length-1];m.fm=FMS.indexOf(c);m.freq=c.f;m.playing=true},
+ fmseek(v){const m=S.media;const up=v==='+';const c=up?FMS.find(s=>s.f>m.freq+.05)||FMS[0]:[...FMS].reverse().find(s=>s.f<m.freq-.05)||FMS[FMS.length-1];m.fm=FMS.indexOf(c);m.freq=c.f;m.playing=true;if(S.screen!=='media')toast('radio',`${N(c.f.toFixed(1))} · ${nm(c)}`)},
  vol(v){const m=S.media;if(v==='mute')m.mute=!m.mute;else{m.mute=false;m.vol=Math.max(0,Math.min(30,m.vol+(v==='+'?1:-1)))}volToast()},
  ptab(v){S.phone.tab=v;S.phone.open=null},
  popen(v){S.phone.open=S.phone.open===v?null:v},
@@ -682,15 +1007,16 @@ const ACT={
  nclose(){S.nav.mode=S.nav.dest?'route':'idle'},
  nkey(v){if(S.nav.q.length<30)S.nav.q+=v},ndel(){S.nav.q=S.nav.q.slice(0,-1)},nkb(){S.nav.kb=S.nav.kb==='fa'?'en':'fa'},
  npick(v){S.nav.sel=v;S.nav.mode='preview';S.nav.zoom=1},
- nstart(){S.nav.dest=S.nav.sel;S.nav.mode='route';S.nav.t0=Date.now()},
+ nstart(){const n=S.nav;n.dest=n.sel;n.mode='route';n.t0=Date.now();n.prog=0;n.rot=-0.2;n.leg=1;n.zoom=1},
  ncancel(){S.nav.sel=null;S.nav.mode=S.nav.dest?'route':'idle'},
- nend(){S.nav.dest=null;S.nav.sel=null;S.nav.mode='idle';S.nav.zoom=1},
+ nend(){const n=S.nav;n.dest=null;n.sel=null;n.mode='idle';n.zoom=1;n.prog=0;n.rot=-0.2},
  nzoom(v){S.nav.zoom=Math.max(.25,Math.min(4,S.nav.zoom*(v==='+'?1.5:1/1.5)))},
  bright(v){PREF.bright=Math.max(20,Math.min(100,PREF.bright+(v==='+'?10:-10)));savePref()},
  lang(v){S.lang=PREF.lang=v;savePref()},
  click(v){PREF.click=v==='1';savePref()}
 };
-let vtT;
+let vtT,toT;
+function toast(ic,txt){const e=$('#toast');e.innerHTML=I(ic)+'<span>'+esc(SEP(txt))+'</span>';e.classList.remove('show');void e.offsetWidth;e.classList.add('show');clearTimeout(toT);toT=setTimeout(()=>e.classList.remove('show'),1500)}
 function volToast(){const m=S.media,el=$('#vtoast');el.innerHTML=`${I(m.mute?'mute':'vol')}<div class="vb"><i style="width:${m.mute?0:m.vol/30*100}%"></i></div><b class="num">${m.mute?'—':N(m.vol)}</b>`;el.style.opacity=1;clearTimeout(vtT);vtT=setTimeout(()=>el.style.opacity=0,1300)}
 
 /* click sound */
@@ -698,6 +1024,7 @@ let ac=null;
 function tick(){if(!PREF.click)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.frequency.value=1900;g.gain.setValueAtTime(.05,ac.currentTime);g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.03);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.035)}catch(e){}}
 
 $('#app').addEventListener('click',e=>{const el=e.target.closest('[data-a]');if(!el)return;
+  if(el.dataset.a==='wheel'){const it=e.target.closest('.wi');if(it)el.scrollTo({top:+it.dataset.i*IH,behavior:'smooth'});return}
   const f=ACT[el.dataset.a];if(!f)return;
   if(el.dataset.a==='closesheet'&&e.target!==el)return;
   tick();f(el.dataset.v,el);render();checkTask()});
@@ -725,8 +1052,9 @@ document.addEventListener('pointerdown',e=>{
   if(!trial||!trial.running)return; if(!$('#app').contains(e.target)||e.target.closest('[data-nolog]'))return;
   const el=e.target.closest('[data-a]'); const now=performance.now()-trial.start;
   const lbl=el?el.dataset.a+(el.dataset.v!==undefined?':'+el.dataset.v:''):'miss';
-  trial.taps++; if(!el)trial.misses++; if(trial.first==null)trial.first=now;
-  if(trial.path.length<400)trial.path.push({t:Math.round(now),a:lbl,s:S.screen});
+  const blind=!!(trial.occ&&!trial.occ.open);
+  trial.taps++; if(!el)trial.misses++; if(blind)trial.occ.taps++; if(trial.first==null)trial.first=now;
+  if(trial.path.length<400)trial.path.push(blind?{t:Math.round(now),a:lbl,s:S.screen,o:1}:{t:Math.round(now),a:lbl,s:S.screen});
 },true);
 
 function startTask(id){
@@ -735,19 +1063,27 @@ function startTask(id){
   pending={task:tk};
   const q=S.lang==='fa'?tk.fa:tk.en;
   $('#ovl').innerHTML=`<div class="ovl instr" dir="${S.lang==='fa'?'rtl':'ltr'}" style="font-family:${S.lang==='fa'?'var(--ff)':'var(--fe)'}"><div class="box">
-   <div class="k">${tk.id} · ${tk.lv}</div><div class="q">${esc(q)}</div>
+   <div class="k">${tk.id} · ${tk.lv}</div><div class="q">${esc(q)}</div>${PREF.occ.on?`<div style="color:var(--tx2);font-size:18px">${S.lang==='fa'?'صفحه به‌طور متناوب تاریک می‌شود. کار را ادامه دهید.':'The screen will go dark at intervals. Keep going.'}</div>`:''}
    <button class="btn pri" id="goBtn">${S.lang==='fa'?'شروع':'Start'}</button></div></div>`;
   $('#goBtn').onclick=()=>{ $('#ovl').innerHTML='';
-    trial={task:tk,base:JSON.parse(JSON.stringify(S)),start:performance.now(),startedAt:new Date().toISOString(),taps:0,misses:0,first:null,path:[],running:true};
+    trial={task:tk,base:JSON.parse(JSON.stringify(S)),start:performance.now(),startedAt:new Date().toISOString(),taps:0,misses:0,first:null,path:[],running:true,layout:PREF.layout,mode:S.mode,occ:null};
+    if(PREF.occ.on){trial.occ={open:true,openAt:performance.now(),tsot:0,intervals:1,taps:0,timer:null,o:+PREF.occ.open||1500,c:+PREF.occ.closed||1500};occCycle()}
     pending=null; renderStatus(); };
 }
+function occCycle(){const o=trial&&trial.occ;if(!o||!trial.running)return;
+  o.timer=setTimeout(()=>{if(!trial.running)return;const now=performance.now();
+    if(o.open){o.tsot+=now-o.openAt;o.open=false;$('#occ').classList.add('on');}
+    else{o.open=true;o.openAt=now;o.intervals++;$('#occ').classList.remove('on');}
+    occCycle()},o.open?o.o:o.c)}
+function occStop(){const o=trial&&trial.occ;if(!o)return;clearTimeout(o.timer);if(o.open)o.tsot+=performance.now()-o.openAt;o.open=true;$('#occ').classList.remove('on')}
 function checkTask(){ if(!trial||!trial.running)return; if(trial.task.ok(S,trial.base))finish('success'); }
 async function finish(result){
-  if(!trial||!trial.running)return; trial.running=false;
-  const dur=Math.round(performance.now()-trial.start);
+  if(!trial||!trial.running)return; const endAt=performance.now(); occStop(); trial.running=false;
+  const dur=Math.round(endAt-trial.start); const oc=trial.occ;
   const rec={participant:PREF.participant||'—',condition:PREF.condition||'',task:trial.task.id,level:trial.task.lv,taskLabel:trial.task.en,
     result,durationMs:dur,taps:trial.taps,misses:trial.misses,firstTapMs:trial.first==null?null:Math.round(trial.first),
-    screens:[...new Set(trial.path.map(p=>p.s))],path:trial.path,lang:S.lang,startedAt:trial.startedAt};
+    screens:[...new Set(trial.path.map(p=>p.s))],path:trial.path,lang:S.lang,startedAt:trial.startedAt,layout:trial.layout,mode:trial.mode,
+    occlusion:oc?`${oc.o}/${oc.c}`:'off',tsotMs:oc?Math.round(oc.tsot):null,openIntervals:oc?oc.intervals:null,tapsOccluded:oc?oc.taps:null};
   renderStatus();
   if(result==='success'){ $('#ovl').innerHTML=`<div class="ovl done"><div class="ck">${I('check')}</div></div>`; setTimeout(()=>$('#ovl').innerHTML='',950) }
   local.unshift({id:'L'+Date.now(),...rec}); local=local.slice(0,500); store.set('trials',local);
@@ -757,26 +1093,31 @@ async function finish(result){
   setTimeout(()=>openPanel(),result==='success'?1000:200);
 }
 const rows=()=>remote||local;
-function csv(){const H=['participant','condition','task','level','result','duration_s','taps','misses','first_tap_s','screens','path','started_at','lang'];
+function csv(){const H=['participant','condition','mode','layout','occlusion','task','level','result','duration_s','taps','misses','first_tap_s','tsot_s','open_intervals','taps_occluded','screens','path','started_at','lang'];
   const q=v=>{v=v==null?'':String(v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
-  return [H.join(','),...[...rows()].reverse().map(r=>[r.participant,r.condition,r.task,r.level,r.result,(r.durationMs/1000).toFixed(2),r.taps,r.misses,r.firstTapMs==null?'':(r.firstTapMs/1000).toFixed(2),(r.screens||[]).join(' > '),(r.path||[]).map(p=>p.a).join(' > '),r.startedAt,r.lang].map(q).join(','))].join('\n')}
+  return [H.join(','),...[...rows()].reverse().map(r=>[r.participant,r.condition,r.mode||'urban',r.layout||'deep',r.occlusion||'off',r.task,r.level,r.result,(r.durationMs/1000).toFixed(2),r.taps,r.misses,r.firstTapMs==null?'':(r.firstTapMs/1000).toFixed(2),r.tsotMs==null?'':(r.tsotMs/1000).toFixed(2),r.openIntervals??'',r.tapsOccluded??'',(r.screens||[]).join(' > '),(r.path||[]).map(p=>p.a).join(' > '),r.startedAt,r.lang].map(q).join(','))].join('\n')}
 
 function openPanel(){ renderPanel(); $('#rp').hidden=false; }
 function closePanel(){ $('#rp').hidden=true; }
 function renderPanel(){
   const el=$('#rp'); const R=rows();
-  const live=trial&&trial.running?`<div class="live"><b>Running ${trial.task.id} — ${esc(trial.task.en)}</b><span class="note">${trial.taps} taps · ${((performance.now()-trial.start)/1000).toFixed(1)} s</span>
+  const live=trial&&trial.running?`<div class="live"><b>Running ${trial.task.id} — ${esc(trial.task.en)}</b><span class="note">${trial.taps} taps · ${((performance.now()-trial.start)/1000).toFixed(1)} s${trial.occ?' · occlusion on':''}</span>
     <div class="fr"><button class="rb x" data-r="abort">End as not completed</button><button class="rb" data-r="close">Back to participant</button></div></div>`:'';
   const last=R[0];
-  const lastBox=!live&&last?`<div class="live"><b class="res-${last.result}">${last.task} · ${last.result} · ${(last.durationMs/1000).toFixed(1)} s · ${last.taps} taps (${last.misses} missed)</b><span class="note">${esc(msg)}</span></div>`:'';
+  const lastBox=!live&&last?`<div class="live"><b class="res-${last.result}">${last.task} · ${last.result} · ${(last.durationMs/1000).toFixed(1)} s · ${last.taps} taps (${last.misses} missed)${last.tsotMs!=null?` · TSOT ${(last.tsotMs/1000).toFixed(1)} s`:''}</b><span class="note">${esc(msg)}</span></div>`:'';
   el.innerHTML=`<div class="rp" role="dialog" aria-label="Researcher panel"><header><b>Researcher</b><button class="rb" data-r="close">Close</button></header><div class="body">
    ${live}${lastBox}
    <div><h4>Session</h4><div class="fr"><label>Participant<input id="rpP" value="${esc(PREF.participant)}" autocomplete="off"></label><label>Condition<input id="rpC" value="${esc(PREF.condition)}" autocomplete="off"></label></div>
-   <div class="fr" style="margin-top:10px"><button class="rb ${S.lang==='fa'?'a':''}" data-r="lang" data-v="fa">UI فارسی</button><button class="rb ${S.lang==='en'?'a':''}" data-r="lang" data-v="en">UI English</button><button class="rb" data-r="reset">Reset to start state</button></div></div>
+   <div class="fr" style="margin-top:10px"><button class="rb ${S.lang==='fa'?'a':''}" data-r="lang" data-v="fa">UI فارسی</button><button class="rb ${S.lang==='en'?'a':''}" data-r="lang" data-v="en">UI English</button><button class="rb" data-r="reset">Reset to start state</button></div>
+   <div class="fr" style="margin-top:10px;align-items:center"><span class="note" style="min-width:64px">Mode</span>${Object.entries(MODES).map(([k,m])=>`<button class="rb ${S.mode===k?'a':''}" data-r="mode" data-v="${k}">${m.en}</button>`).join('')}</div>
+   <div class="fr" style="margin-top:10px;align-items:center"><span class="note" style="min-width:64px">Layout</span><button class="rb ${PREF.layout==='deep'?'a':''}" data-r="layout" data-v="deep">Deep — defrost &amp; seat heat on Climate screen</button><button class="rb ${PREF.layout==='shallow'?'a':''}" data-r="layout" data-v="shallow">Shallow — in the bottom bar</button></div>
+   <div class="fr" style="margin-top:10px;align-items:flex-end"><span class="note" style="min-width:64px;align-self:center">Occlusion</span><button class="rb ${PREF.occ.on?'':'a'}" data-r="occ" data-v="0">Off</button><button class="rb ${PREF.occ.on?'a':''}" data-r="occ" data-v="1">On</button>
+    <label style="max-width:110px">Visible ms<input id="rpO" inputmode="numeric" value="${PREF.occ.open}"></label><label style="max-width:110px">Dark ms<input id="rpX" inputmode="numeric" value="${PREF.occ.closed}"></label></div>
+   <p class="note" style="margin:8px 0 0">Occlusion blanks the screen in fixed cycles while touch keeps working; TSOT (total visible time to finish) is logged as a visual-demand measure. Check the interval values against ISO 16673 before you report them.</p></div>
    <div><h4>Tasks — reset to start state, show instruction, time from “Start”</h4><div class="tl">${TASKS.map(k=>`<div class="trow"><span class="c">${k.id}<div class="lv">${k.lv}</div></span><span class="d">${esc(k.fa)}</span><button class="rb a" data-r="run" data-v="${k.id}">Run</button></div>`).join('')}</div></div>
    <div><h4>Trials (${R.length}) ${remote?'· shared log':'· this device'}</h4>
-    <div class="tbw"><table><thead><tr><th>P</th><th>Task</th><th>Result</th><th>Time s</th><th>Taps</th><th>Miss</th><th>1st tap s</th></tr></thead><tbody>
-    ${R.slice(0,60).map(r=>`<tr><td>${esc(r.participant)}</td><td>${r.task}</td><td class="res-${r.result}">${r.result}</td><td>${(r.durationMs/1000).toFixed(1)}</td><td>${r.taps}</td><td>${r.misses}</td><td>${r.firstTapMs==null?'—':(r.firstTapMs/1000).toFixed(1)}</td></tr>`).join('')||'<tr><td colspan="7" class="note">No trials yet. Run a task above.</td></tr>'}
+    <div class="tbw"><table><thead><tr><th>P</th><th>Task</th><th>Mode</th><th>Layout</th><th>Result</th><th>Time s</th><th>Taps</th><th>Miss</th><th>TSOT s</th></tr></thead><tbody>
+    ${R.slice(0,60).map(r=>`<tr><td>${esc(r.participant)}</td><td>${r.task}</td><td>${r.mode||'urban'}</td><td>${r.layout||'deep'}</td><td class="res-${r.result}">${r.result}</td><td>${(r.durationMs/1000).toFixed(1)}</td><td>${r.taps}</td><td>${r.misses}</td><td>${r.tsotMs==null?'—':(r.tsotMs/1000).toFixed(1)}</td></tr>`).join('')||'<tr><td colspan="9" class="note">No trials yet. Run a task above.</td></tr>'}
     </tbody></table></div>
     <div class="fr" style="margin-top:10px">${dl?'<button class="rb a" data-r="dl">Save CSV</button>':''}${!dl&&navigator.canShare?'<button class="rb a" data-r="share">Share CSV</button>':''}<button class="rb" data-r="copy">Copy CSV</button></div>
     <div id="csvbox"></div></div>
@@ -784,12 +1125,17 @@ function renderPanel(){
   </div></div>`;
   const pI=$('#rpP'),cI=$('#rpC');
   pI.onchange=()=>{PREF.participant=pI.value.trim();savePref()}; cI.onchange=()=>{PREF.condition=cI.value.trim();savePref()};
+  const oI=$('#rpO'),xI=$('#rpX'),num=(v,d)=>{v=parseInt(v,10);return v>=200&&v<=10000?v:d};
+  oI.onchange=()=>{PREF.occ.open=num(oI.value,1500);savePref()}; xI.onchange=()=>{PREF.occ.closed=num(xI.value,1500);savePref()};
 }
 $('#rp').addEventListener('click',async e=>{
   if(e.target.id==='rp'){closePanel();return}
   const b=e.target.closest('[data-r]'); if(!b)return; const r=b.dataset.r, v=b.dataset.v;
   const pI=$('#rpP'),cI=$('#rpC'); if(pI){PREF.participant=pI.value.trim();PREF.condition=cI.value.trim();savePref()}
   if(r==='close')closePanel();
+  if(r==='mode'){S.mode=PREF.mode=v;savePref();render();renderPanel()}
+  if(r==='layout'){PREF.layout=v;savePref();render();renderPanel()}
+  if(r==='occ'){PREF.occ.on=v==='1';savePref();renderPanel()}
   if(r==='run')startTask(v);
   if(r==='abort'){await finish('abandoned')}
   if(r==='reset'){S=fresh();render();closePanel()}
@@ -815,6 +1161,22 @@ setInterval(()=>{if(!$('#rp').hidden&&trial&&trial.running){const n=$('#rp .live
   if(!$('#rp').hidden)renderPanel();
 })();
 
+/* deep links for design import: ?screen=climate&nav=route&call=1&sheet=src&layout=shallow&lang=en&demo=1 */
+(()=>{let q;try{q=new URLSearchParams(location.search||location.hash.replace(/^#/,''))}catch(e){return}
+  const g=k=>q.get(k); if(![...q.keys()].length)return;
+  if(g('lang')==='en'||g('lang')==='fa'){S.lang=g('lang')}
+  if(g('layout')==='shallow'||g('layout')==='deep')PREF.layout=g('layout');
+  if(MODES[g('mode')])S.mode=g('mode'); if(g('sheet')==='mode')S.sheet='mode';
+  if(['home','nav','media','phone','climate','settings'].includes(g('screen')))S.screen=g('screen');
+  if(g('demo')==='1'){Object.assign(S.clim,{dT:23.5,seatL:2,rDef:true,mode:'both'})}
+  const nv=g('nav');if(nv==='search'){S.nav.mode='search';S.nav.q=S.lang==='fa'?'میلاد':'milad'}
+  if(nv==='preview'){S.nav.sel='milad';S.nav.mode='preview'}
+  if(nv==='route'||nv==='arrived'){S.nav.sel=S.nav.dest='milad';S.nav.mode=nv;S.nav.prog=nv==='arrived'?geom(PB.milad).L:900;S.nav.rot=-Math.PI/2-posAt(geom(PB.milad),S.nav.prog).h}
+  if(g('media')==='fm')S.media.src='fm'; if(g('sheet')==='src'){S.screen=g('screen')==='home'?'home':'media';S.sheet='src'}
+  if(g('phone'))S.phone.tab=g('phone');
+  if(g('call')==='1')S.phone.call={cid:'sara',num:CB.sara.n,name:nm(CB.sara),t0:Date.now()-65000,mute:false,spk:false};
+  if(g('freeze')==='1')S.nav.mode==='route'&&(S.nav.freeze=true);
+})();
 render();
 })();
 </script>
