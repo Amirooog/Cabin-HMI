@@ -14,6 +14,10 @@ Rules
 - Freeze a build before data collection starts: tag it `-field` in the notes below and change nothing until collection ends.
 - Upload `index.html` + `sw.js` together; the id in both must match.
 
+## TB-2.0.2 — 2026-09-20
+- Fix: installed app now fills the iPad screen. The safe-area insets are applied inside the screen (status row and bottom bar) instead of around it, with a fallback when iPadOS reports no insets, plus a manual Screen fit nudge in the researcher panel.
+- Slightly larger type and dock on 11-inch and larger displays.
+
 ## TB-2.0.1 — 2026-09-20
 - Fix: updates now reach the installed app on the first online launch (page fetched past the browser cache; the app checks for a new version each time it comes to the foreground and reloads itself, never during a running trial).
 

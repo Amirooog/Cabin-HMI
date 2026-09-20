@@ -433,6 +433,17 @@ svg.f{fill:currentColor;stroke:none}
 .tile.io{gap:8px}
 .tile.io svg.i{width:32px;height:32px}
 @media (prefers-reduced-motion:reduce){.wi{transition:none}}
+
+/* v: installed-app fit — insets live inside the screen, never around it */
+:root{--sat:0px;--sab:0px}
+body.pwa{padding:0!important}
+body.pwa #app{border-radius:0;grid-template-rows:calc(46px + var(--sat)) minmax(0,1fr) calc(96px + var(--sab))}
+body.pwa .status{padding-top:var(--sat);align-items:center}
+body.pwa .bar{padding-bottom:var(--sab)}
+body.pwa .rp header{padding-top:calc(14px + var(--sat))}
+body.pwa .rp .body{padding-bottom:calc(14px + var(--sab))}
+body.pwa .ovl{padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var(--sab))}
+@media (min-width:1150px) and (min-height:800px){#app{font-size:18px}.dock button{flex-basis:92px}}
 </style>
 </head>
 <body>
@@ -454,7 +465,7 @@ svg.f{fill:currentColor;stroke:none}
 <script>
 (()=>{
 /* ---------- build identity (see CHANGELOG.md) ---------- */
-const BUILD={id:'TB-2.0.1',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
+const BUILD={id:'TB-2.0.2',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
 /* ---------- icons ---------- */
 const IP={
 home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -587,7 +598,7 @@ const TASKS=[
 
 /* ---------- prefs & state ---------- */
 const store={get(k,d){try{const v=localStorage.getItem('hmi.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('hmi.'+k,JSON.stringify(v))}catch(e){}}};
-const PREF=Object.assign({lang:'fa',bright:100,click:true,participant:'P01',condition:'iPad-touch-baseline',layout:'deep',mode:'urban',occ:{on:false,open:1500,closed:1500}},store.get('pref',{}));
+const PREF=Object.assign({lang:'fa',bright:100,click:true,participant:'P01',condition:'iPad-touch-baseline',layout:'deep',mode:'urban',fit:{t:0,b:0},occ:{on:false,open:1500,closed:1500}},store.get('pref',{}));
 function fresh(){return{
   lang:PREF.lang,screen:'home',sheet:null,mode:PREF.mode||'urban',
   clim:{dT:22,pT:22,fan:3,auto:false,ac:true,recirc:false,sync:false,mode:'face',prevMode:'face',fDef:false,rDef:false,seatL:0,seatR:0,ventL:0,ventR:0,wheel:false},
@@ -1116,7 +1127,11 @@ function renderPanel(){
    <div class="fr" style="margin-top:10px;align-items:center"><span class="note" style="min-width:64px">Layout</span><button class="rb ${PREF.layout==='deep'?'a':''}" data-r="layout" data-v="deep">Deep — defrost &amp; seat heat on Climate screen</button><button class="rb ${PREF.layout==='shallow'?'a':''}" data-r="layout" data-v="shallow">Shallow — in the bottom bar</button></div>
    <div class="fr" style="margin-top:10px;align-items:flex-end"><span class="note" style="min-width:64px;align-self:center">Occlusion</span><button class="rb ${PREF.occ.on?'':'a'}" data-r="occ" data-v="0">Off</button><button class="rb ${PREF.occ.on?'a':''}" data-r="occ" data-v="1">On</button>
     <label style="max-width:110px">Visible ms<input id="rpO" inputmode="numeric" value="${PREF.occ.open}"></label><label style="max-width:110px">Dark ms<input id="rpX" inputmode="numeric" value="${PREF.occ.closed}"></label></div>
-   <p class="note" style="margin:8px 0 0">Occlusion blanks the screen in fixed cycles while touch keeps working; TSOT (total visible time to finish) is logged as a visual-demand measure. Check the interval values against ISO 16673 before you report them.</p></div>
+   <div class="fr" style="margin-top:10px;align-items:flex-end"><span class="note" style="min-width:64px;align-self:center">Screen fit</span>
+    <label style="max-width:120px">Top offset px<input id="rpFT" inputmode="numeric" value="${PREF.fit.t}"></label>
+    <label style="max-width:120px">Bottom offset px<input id="rpFB" inputmode="numeric" value="${PREF.fit.b}"></label>
+    <button class="rb" data-r="fit">Apply</button></div>
+   <p class="note" style="margin:8px 0 0">Use Screen fit only in the installed app, if the picture sits under the iPad status bar or leaves a band at the bottom. Occlusion blanks the screen in fixed cycles while touch keeps working; TSOT (total visible time to finish) is logged as a visual-demand measure. Check the interval values against ISO 16673 before you report them.</p></div>
    <div><h4>Tasks — reset to start state, show instruction, time from “Start”</h4><div class="tl">${TASKS.map(k=>`<div class="trow"><span class="c">${k.id}<div class="lv">${k.lv}</div></span><span class="d">${esc(k.fa)}</span><button class="rb a" data-r="run" data-v="${k.id}">Run</button></div>`).join('')}</div></div>
    <div><h4>Trials (${R.length}) ${remote?'· shared log':'· this device'}</h4>
     <div class="tbw"><table><thead><tr><th>Build</th><th>P</th><th>Task</th><th>Mode</th><th>Layout</th><th>Result</th><th>Time s</th><th>Taps</th><th>Miss</th><th>TSOT s</th></tr></thead><tbody>
@@ -1139,6 +1154,7 @@ $('#rp').addEventListener('click',async e=>{
   if(r==='mode'){S.mode=PREF.mode=v;savePref();render();renderPanel()}
   if(r==='layout'){PREF.layout=v;savePref();render();renderPanel()}
   if(r==='occ'){PREF.occ.on=v==='1';savePref();renderPanel()}
+  if(r==='fit'){const ft=$('#rpFT'),fb=$('#rpFB');PREF.fit={t:parseInt(ft.value,10)||0,b:parseInt(fb.value,10)||0};savePref();if(window.__fit)window.__fit();render()}
   if(r==='run')startTask(v);
   if(r==='abort'){await finish('abandoned')}
   if(r==='reset'){S=fresh();render();closePanel()}
@@ -1179,6 +1195,22 @@ setInterval(()=>{if(!$('#rp').hidden&&trial&&trial.running){const n=$('#rp .live
   if(g('phone'))S.phone.tab=g('phone');
   if(g('call')==='1')S.phone.call={cid:'sara',num:CB.sara.n,name:nm(CB.sara),t0:Date.now()-65000,mute:false,spk:false};
   if(g('freeze')==='1')S.nav.mode==='route'&&(S.nav.freeze=true);
+})();
+/* the installed app draws edge to edge; measure the real insets, fall back when iPadOS reports none */
+(function fit(){
+  const standalone=(window.matchMedia&&window.matchMedia('(display-mode:standalone)').matches)||navigator.standalone===true;
+  if(!standalone)return; document.body.classList.add('pwa');
+  const probe=document.createElement('div');
+  probe.style.cssText='position:fixed;top:0;left:0;width:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)';
+  document.body.appendChild(probe);
+  const set=()=>{const cs=getComputedStyle(probe);let t=parseFloat(cs.paddingTop)||0,b=parseFloat(cs.paddingBottom)||0;
+    if(t<18)t=24; if(b<12)b=18;
+    t=Math.max(0,t+(PREF.fit&&PREF.fit.t||0)); b=Math.max(0,b+(PREF.fit&&PREF.fit.b||0));
+    const r=document.documentElement.style;r.setProperty('--sat',t+'px');r.setProperty('--sab',b+'px');
+    document.querySelectorAll('canvas[data-map]').forEach(drawMap)};
+  window.__fit=set; set();
+  window.addEventListener('resize',set);
+  window.addEventListener('orientationchange',()=>setTimeout(set,350));
 })();
 render();
 })();
