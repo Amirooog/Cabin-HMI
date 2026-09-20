@@ -471,7 +471,7 @@ body.pwa,body.pwa #app{height:var(--vh,100%);max-height:var(--vh,100%)}
 <script>
 (()=>{
 /* ---------- build identity (see CHANGELOG.md) ---------- */
-const BUILD={id:'TB-2.0.4',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
+const BUILD={id:'TB-2.0.5',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
 /* ---------- icons ---------- */
 const IP={
 home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -1218,8 +1218,12 @@ setInterval(()=>{if(!$('#rp').hidden&&trial&&trial.running){const n=$('#rp .live
     const land=W>=H, full=land?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height);
     const reserved=full-H;                     // >4 ⇒ iPadOS already keeps the bars out of our window
     const cs=getComputedStyle(probe);
-    let t=0,b=0;
-    if(reserved<=4){ t=parseFloat(cs.paddingTop)||0; b=parseFloat(cs.paddingBottom)||0; if(t<18)t=24; if(b<12)b=18; }
+    // iPadOS lays the window out from the very top and keeps its space at the BOTTOM:
+    // the status bar overlays our top edge, so pad the top by the real inset and
+    // only pad the bottom by whatever the window has not already given up.
+    let t=parseFloat(cs.paddingTop)||0, b=parseFloat(cs.paddingBottom)||0;
+    if(t<18)t=24; if(b<12)b=18;
+    b=Math.max(0,b-Math.max(0,reserved));
     t=Math.max(0,t+(PREF.fit&&PREF.fit.t||0)); b=Math.max(0,b+(PREF.fit&&PREF.fit.b||0));
     const r=document.documentElement.style;
     r.setProperty('--sat',t+'px'); r.setProperty('--sab',b+'px'); r.setProperty('--vh',H+'px');

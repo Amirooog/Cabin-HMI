@@ -14,6 +14,9 @@ Rules
 - Freeze a build before data collection starts: tag it `-field` in the notes below and change nothing until collection ends.
 - Upload `index.html` + `sw.js` together; the id in both must match.
 
+## TB-2.0.5 — 2026-09-20
+- Fix: top inset restored (the iPadOS status bar overlays the window's top edge) while the bottom padding is reduced by whatever height the window already gives up, so nothing is padded twice and no strip is left under the bottom bar.
+
 ## TB-2.0.4 — 2026-09-20
 - Fix: on iPadOS the app window is already shrunk by the status bar, so the app no longer adds the inset a second time. It measures the window against the screen, pads only what the OS has not, and pins its height to the real viewport.
 
