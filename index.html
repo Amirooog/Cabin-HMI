@@ -448,6 +448,8 @@ body.pwa .ovl{padding-top:calc(24px + var(--sat));padding-bottom:calc(24px + var
 /* installed app: paint the whole canvas, so any area the OS keeps outside the viewport matches */
 body.pwa{background:var(--screen)}
 body.pwa #amb i{opacity:.95}
+
+body.pwa,body.pwa #app{height:var(--vh,100%);max-height:var(--vh,100%)}
 </style>
 </head>
 <body>
@@ -469,7 +471,7 @@ body.pwa #amb i{opacity:.95}
 <script>
 (()=>{
 /* ---------- build identity (see CHANGELOG.md) ---------- */
-const BUILD={id:'TB-2.0.3',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
+const BUILD={id:'TB-2.0.4',line:'TB',name:'Touch Baseline',date:'2026-09-20'};
 /* ---------- icons ---------- */
 const IP={
 home:'M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z',
@@ -900,7 +902,7 @@ function updNavUI(r){const set=(id,v)=>{const e=document.getElementById(id);if(e
 function diag(){const r=getComputedStyle(document.documentElement);
   const sa=(r.getPropertyValue('--sat')||'0').trim()+'/'+(r.getPropertyValue('--sab')||'0').trim();
   const st=document.body.classList.contains('pwa')?'app':'browser';
-  return `${st} · ${Math.round(window.innerWidth)}×${Math.round(window.innerHeight)} · screen ${Math.round(screen.width)}×${Math.round(screen.height)} · inset ${sa}`}
+  return window.__diag?`${st} · ${window.__diag}`:`${st} · ${Math.round(window.innerWidth)}×${Math.round(window.innerHeight)} · screen ${Math.round(screen.width)}×${Math.round(screen.height)} · inset ${sa}`}
 function settings(){
   return `<div class="scr${enterCls}" style="overflow-y:auto"><div class="set">
    <div class="card srow"><span class="lbl">${t('display')}</span><div class="bri" dir="ltr"><button ${A('bright','-')} aria-label="−">${I('minus')}</button><div class="bar2"><i style="width:${PREF.bright}%"></i></div><button ${A('bright','+')} aria-label="+">${I('plus')}</button></div></div>
@@ -1211,13 +1213,21 @@ setInterval(()=>{if(!$('#rp').hidden&&trial&&trial.running){const n=$('#rp .live
   const probe=document.createElement('div');
   probe.style.cssText='position:fixed;top:0;left:0;width:0;visibility:hidden;pointer-events:none;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)';
   document.body.appendChild(probe);
-  const set=()=>{const cs=getComputedStyle(probe);let t=parseFloat(cs.paddingTop)||0,b=parseFloat(cs.paddingBottom)||0;
-    if(t<18)t=24; if(b<12)b=18;
+  const set=()=>{
+    const vv=window.visualViewport, H=Math.round(vv&&vv.height?vv.height:window.innerHeight), W=Math.round(window.innerWidth);
+    const land=W>=H, full=land?Math.min(screen.width,screen.height):Math.max(screen.width,screen.height);
+    const reserved=full-H;                     // >4 ⇒ iPadOS already keeps the bars out of our window
+    const cs=getComputedStyle(probe);
+    let t=0,b=0;
+    if(reserved<=4){ t=parseFloat(cs.paddingTop)||0; b=parseFloat(cs.paddingBottom)||0; if(t<18)t=24; if(b<12)b=18; }
     t=Math.max(0,t+(PREF.fit&&PREF.fit.t||0)); b=Math.max(0,b+(PREF.fit&&PREF.fit.b||0));
-    const r=document.documentElement.style;r.setProperty('--sat',t+'px');r.setProperty('--sab',b+'px');
+    const r=document.documentElement.style;
+    r.setProperty('--sat',t+'px'); r.setProperty('--sab',b+'px'); r.setProperty('--vh',H+'px');
+    window.__diag=`win ${W}×${H} · screen ${screen.width}×${screen.height} · reserved ${reserved} · inset ${t}/${b}`;
     document.querySelectorAll('canvas[data-map]').forEach(drawMap)};
   window.__fit=set; set();
   window.addEventListener('resize',set);
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',set);
   window.addEventListener('orientationchange',()=>setTimeout(set,350));
 })();
 render();
