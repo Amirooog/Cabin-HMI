@@ -14,6 +14,19 @@ Rules
 - Freeze a build before data collection starts: tag it `-field` in the notes below and change nothing until collection ends.
 - Upload `index.html` + `sw.js` together; the id in both must match.
 
+## TB-2.1.0 — 2026-09-20
+- Motion pass: directional screen changes, sliding dock indicator, touch ripple from the finger, staggered fan segments, album-art swap, play/pause pop, route drawing itself on when guidance starts, ambient bloom on mode change.
+- Motion is now a researcher setting (full / minimal / none) and a CSV column; `none` freezes all animation for occlusion runs. Reduce Motion on the iPad is still respected.
+
+## TB-2.0.5 — 2026-09-20
+- Fix: top inset restored (the iPadOS status bar overlays the window's top edge) while the bottom padding is reduced by whatever height the window already gives up, so nothing is padded twice and no strip is left under the bottom bar.
+
+## TB-2.0.4 — 2026-09-20
+- Fix: on iPadOS the app window is already shrunk by the status bar, so the app no longer adds the inset a second time. It measures the window against the screen, pads only what the OS has not, and pins its height to the real viewport.
+
+## TB-2.0.3 — 2026-09-20
+- Installed app: manifest display standalone (with fullscreen preferred), page canvas painted in the app's own base colour so any strip the OS keeps outside the viewport is not black, diagnostic line in Settings (build, window size, screen size, measured insets).
+
 ## TB-2.0.2 — 2026-09-20
 - Fix: installed app now fills the iPad screen. The safe-area insets are applied inside the screen (status row and bottom bar) instead of around it, with a fallback when iPadOS reports no insets, plus a manual Screen fit nudge in the researcher panel.
 - Slightly larger type and dock on 11-inch and larger displays.
